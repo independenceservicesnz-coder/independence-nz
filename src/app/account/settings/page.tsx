@@ -7,24 +7,39 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
- const supabase = await createClient()
+  const supabase = createClient()
 
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       if (!user) return
-      const { data } = await supabase.from('profiles').select('full_name, phone, address, suburb, city').eq('id', user.id).single()
-      if (data) setProfile({ full_name: data.full_name || '', phone: data.phone || '', address: data.address || '', suburb: data.suburb || '', city: data.city || '' })
+      const { data } = await supabase
+        .from('profiles')
+        .select('full_name, phone, address, suburb, city')
+        .eq('id', user.id)
+        .single()
+      if (data) setProfile({
+        full_name: data.full_name || '',
+        phone: data.phone || '',
+        address: data.address || '',
+        suburb: data.suburb || '',
+        city: data.city || ''
+      })
       setLoading(false)
     }
     load()
   }, [])
 
   const save = async (e: React.FormEvent) => {
-    e.preventDefault(); setSaving(true)
+    e.preventDefault()
+    setSaving(true)
     const { data: { user } } = await supabase.auth.getUser()
-    await supabase.from('profiles').update({ ...profile, updated_at: new Date().toISOString() }).eq('id', user!.id)
-    setSaving(false); setSaved(true)
+    await supabase
+      .from('profiles')
+      .update({ ...profile, updated_at: new Date().toISOString() })
+      .eq('id', user!.id)
+    setSaving(false)
+    setSaved(true)
     setTimeout(() => setSaved(false), 3000)
   }
 
@@ -40,7 +55,11 @@ export default function SettingsPage() {
         <p className="text-gray-400 text-sm mt-1">Update your personal details and preferences.</p>
       </div>
 
-      {saved && <div className="bg-brand-50 border border-brand-100 text-brand-600 text-sm rounded-xl px-4 py-3">✓ Profile updated successfully.</div>}
+      {saved && (
+        <div className="bg-brand-50 border border-brand-100 text-brand-600 text-sm rounded-xl px-4 py-3">
+          ✓ Profile updated successfully.
+        </div>
+      )}
 
       <form onSubmit={save} className="space-y-5">
         <div className="card p-6 space-y-4">
@@ -71,17 +90,19 @@ export default function SettingsPage() {
               <label className="lbl">City</label>
               <select className="inp" value={profile.city} onChange={set('city')}>
                 <option value="">Select city</option>
-                {['Auckland', 'Wellington', 'Christchurch', 'Hamilton', 'Tauranga', 'Dunedin'].map(c => <option key={c}>{c}</option>)}
+                {['Auckland', 'Wellington', 'Christchurch', 'Hamilton', 'Tauranga', 'Dunedin'].map(c => (
+                  <option key={c}>{c}</option>
+                ))}
               </select>
             </div>
           </div>
         </div>
 
-        <button type="submit" disabled={saving}
-          className="btn-primary disabled:opacity-60">
+        <button type="submit" disabled={saving} className="btn-primary disabled:opacity-60">
           {saving ? 'Saving...' : '✓ Save changes'}
         </button>
       </form>
     </div>
   )
+}
 }
