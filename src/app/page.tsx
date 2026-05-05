@@ -68,6 +68,21 @@ export default function HomePage() {
             ))}
           </div>
         </div>
+        <div className="max-w-6xl mx-auto px-4 pb-16 w-full">
+        <div className="rounded-2xl overflow-hidden h-72 md:h-96 relative">
+          <img
+            src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=1200&q=80"
+            alt="Happy elderly couple at home"
+            className="w-full h-full object-cover"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-700/60 to-transparent flex items-center">
+            <div className="px-10 text-white max-w-md">
+              <h2 className="font-serif text-3xl font-medium mb-3">Independence at home,<br/>supported with care</h2>
+              <p className="text-white/80 text-sm leading-relaxed">Trusted by over 2,400 New Zealand families to find reliable home services.</p>
+            </div>
+          </div>
+        </div>
+      </div>
       </section>
 {/* HELPLINE BANNER */}
       <div className="bg-brand-700 text-white">
@@ -79,9 +94,9 @@ export default function HomePage() {
               <p className="text-white/70 text-xs">Our friendly team will find the right provider and book for you</p>
             </div>
           </div>
-          <a href="tel:0800123456"
+          <a href="tel:027 325 9707"
             className="shrink-0 bg-white text-brand-500 font-bold px-6 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">
-            📞 0800 123 456
+            📞 027 325 9707
           </a>
           <p className="text-white/60 text-xs shrink-0">Mon–Fri 8am–6pm · Sat 9am–3pm</p>
         </div>
