@@ -70,11 +70,11 @@ export default function HomePage() {
         </div>
         <div className="max-w-6xl mx-auto px-4 pb-16 w-full">
         <div className="rounded-2xl overflow-hidden h-72 md:h-96 relative">
-          <img
-src="/age-cymru-w1eDyNeSMi0-unsplash.jpg""
-alt="Happy elderly couple smiling at home"
-            className="w-full h-full object-cover"
-          />
+<img
+  src="/elderly-couple.jpg"
+  alt="Happy elderly couple dancing and laughing together"
+  className="w-full h-full object-cover"
+/>
           <div className="absolute inset-0 bg-gradient-to-r from-brand-700/60 to-transparent flex items-center">
             <div className="px-10 text-white max-w-md">
 <h2 className="font-serif text-3xl font-medium mb-3">Living life fully,<br/>in the home you love</h2>
