@@ -3,9 +3,15 @@ import { createClient } from '@/lib/supabase/server'
 import Navbar from '@/components/layout/Navbar'
 import AccountSidebar from '@/components/account/AccountSidebar'
 
-export default async function AccountLayout({ children }: { children: React.ReactNode }) {
+export default async function AccountLayout({
+  children,
+}: {
+  children: React.ReactNode
+}) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
   if (!user) redirect('/auth/login?redirect=/account')
 
   const { data: profile } = await supabase
