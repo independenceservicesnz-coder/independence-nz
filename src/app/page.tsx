@@ -71,8 +71,8 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 pb-16 w-full">
         <div className="rounded-2xl overflow-hidden h-72 md:h-96 relative">
 <img
-  src="/elderly-couple.jpg"
-  alt="Happy elderly couple dancing and laughing together"
+src="https://images.unsplash.com/photo-1575783970733-1aaedde1db74?w=1200&q=80"
+alt="Happy elderly couple smiling together"
   className="w-full h-full object-cover"
 />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-700/60 to-transparent flex items-center">
