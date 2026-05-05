@@ -13,17 +13,27 @@ export async function middleware(request: NextRequest) {
         setAll(cookiesToSet) {
           cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
           supabaseResponse = NextResponse.next({ request })
-          cookiesToSet.forEach(({ name, value, options }) => supabaseResponse.cookies.set(name, value, options))
+          cookiesToSet.forEach(({ name, value, options }) =>
+            supabaseResponse.cookies.set(name, value, options)
+          )
         },
       },
     }
   )
 
+  // Refresh session — this is what keeps users logged in
   const { data: { user } } = await supabase.auth.getUser()
 
+  // If logged in and trying to visit auth pages, redirect to account
+  if (user && request.nextUrl.pathname.startsWith('/auth/login')) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/account'
+    return NextResponse.redirect(url)
+  }
+
+  // If not logged in and trying to visit protected pages, redirect to login
   const protectedPaths = ['/account']
   const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
-
   if (isProtected && !user) {
     const url = request.nextUrl.clone()
     url.pathname = '/auth/login'
@@ -35,5 +45,7 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)'],
+  matcher: [
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 }
