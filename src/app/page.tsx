@@ -71,14 +71,14 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4 pb-16 w-full">
         <div className="rounded-2xl overflow-hidden h-72 md:h-96 relative">
           <img
-            src="https://images.unsplash.com/photo-1581579438747-1dc8d17bbce4?w=1200&q=80"
-            alt="Happy elderly couple at home"
+src="https://images.unsplash.com/photo-1727176682983-7d4e7b937b0a?w=1200&q=80"
+alt="Happy elderly couple smiling and holding hands at home"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-700/60 to-transparent flex items-center">
             <div className="px-10 text-white max-w-md">
-              <h2 className="font-serif text-3xl font-medium mb-3">Independence at home,<br/>supported with care</h2>
-              <p className="text-white/80 text-sm leading-relaxed">Trusted by over 2,400 New Zealand families to find reliable home services.</p>
+<h2 className="font-serif text-3xl font-medium mb-3">Living life fully,<br/>in the home you love</h2>
+<p className="text-white/80 text-sm leading-relaxed">Trusted by over 2,400 New Zealand families to find reliable home services.</p>
             </div>
           </div>
         </div>
