@@ -3,7 +3,7 @@ import Link from 'next/link'
 import ReviewButton from '@/components/account/ReviewButton'
 
 export default async function BookingsPage() {
-const supabase = await createClient()
+  const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
   const { data: raw } = await supabase
