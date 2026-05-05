@@ -9,7 +9,7 @@ const categories = [
   { name: 'Gardening', slug: 'gardening', icon: '🌿', count: 28 },
   { name: 'Handyman', slug: 'handyman', icon: '🔧', count: 31 },
   { name: 'Fitness & Mobility', slug: 'fitness', icon: '🏃', count: 19 },
-  { name: 'Personal Care', slug: 'care', icon: '❤️', count: 14 },
+  { name: 'Personal Care', slug: 'care', icon: '🤝', count: 14 },
   { name: 'Transport', slug: 'transport', icon: '🚗', count: 11 },
 ]
 
@@ -69,7 +69,23 @@ export default function HomePage() {
           </div>
         </div>
       </section>
-
+{/* HELPLINE BANNER */}
+      <div className="bg-brand-700 text-white">
+        <div className="max-w-6xl mx-auto px-4 py-4 flex flex-col md:flex-row items-center justify-center gap-4 text-center md:text-left">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">📞</span>
+            <div>
+              <p className="font-medium text-sm">Prefer to book by phone? Call our NZ helpline</p>
+              <p className="text-white/70 text-xs">Our friendly team will find the right provider and book for you</p>
+            </div>
+          </div>
+          <a href="tel:0800123456"
+            className="shrink-0 bg-white text-brand-500 font-bold px-6 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm">
+            📞 0800 123 456
+          </a>
+          <p className="text-white/60 text-xs shrink-0">Mon–Fri 8am–6pm · Sat 9am–3pm</p>
+        </div>
+      </div>
       {/* CATEGORIES */}
       <section className="max-w-6xl mx-auto px-4 py-16 w-full">
         <div className="flex items-baseline justify-between mb-8">
