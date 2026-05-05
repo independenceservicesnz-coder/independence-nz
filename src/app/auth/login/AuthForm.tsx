@@ -210,7 +210,7 @@ export default function AuthForm() {
             <p className="text-xs text-gray-400 mb-3">Our friendly NZ-based team can book a service for you over the phone.</p>
             <a href="tel:0800123456"
               className="inline-flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-500 font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
-              📞 Call 0800 123 456
+              📞 Call 027 325 9707
             </a>
             <p className="text-xs text-gray-400 mt-2">Mon–Fri 8am–6pm · Sat 9am–3pm</p>
           </div>
