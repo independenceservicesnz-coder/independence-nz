@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Account Settings — Independence NZ</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-bg { background: var(--bg); min-height: 100vh; padding-bottom: 60px; }
+    .settings-section { background: white; border-radius: var(--radius); border: 1px solid var(--border); margin-bottom: 20px; overflow: hidden; }
+    .settings-header { padding: 18px 24px; border-bottom: 1px solid var(--border); }
+    .settings-header h3 { font-size: 15px; font-weight: 500; }
+    .settings-header p { font-size: 13px; color: var(--text3); margin-top: 2px; }
+    .settings-body { padding: 24px; }
+    .input-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .avatar-section { display: flex; align-items: center; gap: 16px; }
+    .avatar-upload { position: relative; }
+    .avatar-upload-btn { position: absolute; bottom: 0; right: 0; width: 26px; height: 26px; background: var(--brand); border-radius: 50%; border: 2px solid white; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 12px; }
+    .toggle-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #F9FAFB; }
+    .toggle-row:last-child { border-bottom: none; }
+    .toggle-label { font-size: 14px; font-weight: 500; }
+    .toggle-sub { font-size: 12px; color: var(--text3); margin-top: 2px; }
+    .toggle { width: 44px; height: 24px; background: #E5E7EB; border-radius: 12px; position: relative; cursor: pointer; transition: background 0.2s; border: none; flex-shrink: 0; }
+    .toggle.on { background: var(--brand); }
+    .toggle::after { content: ''; position: absolute; width: 18px; height: 18px; background: white; border-radius: 50%; top: 3px; left: 3px; transition: transform 0.2s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+    .toggle.on::after { transform: translateX(20px); }
+    .danger-zone { border-color: #FCA5A5; }
+    .danger-zone .settings-header { background: #FEF2F2; border-bottom-color: #FCA5A5; }
+    .danger-zone .settings-header h3 { color: #DC2626; }
+    select.input { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239CA3AF' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 14px center; padding-right: 36px; cursor: pointer; }
+  </style>
+</head>
+<body class="page-bg">
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="nav-links"><a href="browse.html">Browse Services</a></div>
+      <div class="nav-actions">
+        <span style="font-size:14px;color:var(--text2)">Margaret S.</span>
+        <div class="avatar" style="background:var(--brand-light);color:var(--brand)">MS</div>
+        <a href="index.html" class="btn btn-secondary btn-sm">Sign out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="account-layout" style="padding-top:32px">
+    <aside class="sidebar">
+      <div class="card sidebar-profile" style="margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="avatar avatar-lg" style="background:var(--brand-light);color:var(--brand)">MS</div>
+          <div>
+            <div style="font-size:15px;font-weight:500">Margaret Smith</div>
+            <div style="font-size:12px;color:var(--text3)">margaret@email.com</div>
+          </div>
+        </div>
+      </div>
+      <div class="card sidebar-nav">
+        <a href="account.html"><span class="nav-icon">📊</span> Overview</a>
+        <a href="account-bookings.html"><span class="nav-icon">📋</span> My Bookings</a>
+        <a href="account-reviews.html"><span class="nav-icon">⭐</span> My Reviews</a>
+        <a href="account-saved.html"><span class="nav-icon">❤️</span> Saved Providers</a>
+        <a href="account-notifications.html"><span class="nav-icon">🔔</span> Notifications</a>
+        <a href="account-settings.html" class="active"><span class="nav-icon">⚙️</span> Account Settings</a>
+        <a href="account-security.html"><span class="nav-icon">🔒</span> Security</a>
+      </div>
+    </aside>
+
+    <main>
+      <div style="padding:32px 0 24px">
+        <h1 style="font-size:26px;font-weight:500">Account Settings</h1>
+        <p style="font-size:14px;color:var(--text3);margin-top:4px">Update your personal details and preferences.</p>
+      </div>
+
+      <!-- Success message (hidden by default) -->
+      <div id="successMsg" style="display:none" class="alert alert-success">✓ Your profile has been updated successfully.</div>
+
+      <!-- Profile photo -->
+      <div class="settings-section">
+        <div class="settings-header"><h3>Profile photo</h3></div>
+        <div class="settings-body">
+          <div class="avatar-section">
+            <div class="avatar-upload">
+              <div class="avatar avatar-lg" style="width:72px;height:72px;font-size:24px;background:var(--brand-light);color:var(--brand)">MS</div>
+              <div class="avatar-upload-btn" onclick="alert('Photo upload coming soon!')">📷</div>
+            </div>
+            <div>
+              <div style="font-size:15px;font-weight:500">Margaret Smith</div>
+              <div style="font-size:13px;color:var(--text3);margin-top:2px">margaret@email.com</div>
+              <button onclick="alert('Upload photo coming soon!')" class="btn btn-secondary btn-sm" style="margin-top:10px">Upload photo</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Personal details -->
+      <div class="settings-section">
+        <div class="settings-header">
+          <h3>Personal details</h3>
+          <p>Your name and contact information</p>
+        </div>
+        <div class="settings-body">
+          <div class="input-row form-group">
+            <div>
+              <label class="label">First name</label>
+              <input type="text" class="input" value="Margaret" id="firstName">
+            </div>
+            <div>
+              <label class="label">Last name</label>
+              <input type="text" class="input" value="Smith" id="lastName">
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="label">Email address</label>
+            <input type="email" class="input" value="margaret@email.com" disabled style="background:var(--bg);color:var(--text3);cursor:not-allowed">
+            <div style="font-size:12px;color:var(--text3);margin-top:6px">Contact support to change your email address.</div>
+          </div>
+          <div class="form-group">
+            <label class="label">Phone number</label>
+            <input type="tel" class="input" value="021 456 789" id="phone" placeholder="021 xxx xxxx">
+          </div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save changes</button>
+        </div>
+      </div>
+
+      <!-- Service address -->
+      <div class="settings-section">
+        <div class="settings-header">
+          <h3>Service address</h3>
+          <p>Used to show relevant local providers near you</p>
+        </div>
+        <div class="settings-body">
+          <div class="form-group">
+            <label class="label">Street address</label>
+            <input type="text" class="input" value="47 Remuera Road" id="address">
+          </div>
+          <div class="input-row form-group">
+            <div>
+              <label class="label">Suburb</label>
+              <input type="text" class="input" value="Remuera" id="suburb">
+            </div>
+            <div>
+              <label class="label">City</label>
+              <select class="input" id="city">
+                <option selected>Auckland</option>
+                <option>Wellington</option>
+                <option>Christchurch</option>
+                <option>Hamilton</option>
+                <option>Tauranga</option>
+                <option>Dunedin</option>
+              </select>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="saveProfile()">Save address</button>
+        </div>
+      </div>
+
+      <!-- Notifications -->
+      <div class="settings-section">
+        <div class="settings-header">
+          <h3>Notification preferences</h3>
+          <p>Control how we contact you</p>
+        </div>
+        <div class="settings-body">
+          <div class="toggle-row">
+            <div><div class="toggle-label">Booking confirmations</div><div class="toggle-sub">When a booking is confirmed or updated</div></div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Booking reminders</div><div class="toggle-sub">24 hours before your scheduled service</div></div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Review reminders</div><div class="toggle-sub">Prompt to rate after a completed service</div></div>
+            <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">New provider alerts</div><div class="toggle-sub">When new providers join in your area</div></div>
+            <button class="toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+          <div class="toggle-row">
+            <div><div class="toggle-label">Marketing emails</div><div class="toggle-sub">Promotions and platform updates</div></div>
+            <button class="toggle" onclick="this.classList.toggle('on')"></button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Danger zone -->
+      <div class="settings-section danger-zone">
+        <div class="settings-header">
+          <h3>Danger zone</h3>
+        </div>
+        <div class="settings-body">
+          <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px">
+            <div>
+              <div style="font-size:14px;font-weight:500">Delete account</div>
+              <div style="font-size:13px;color:var(--text3);margin-top:2px">Permanently delete your account and all booking history. This cannot be undone.</div>
+            </div>
+            <button onclick="confirmDelete()" style="background:none;border:1.5px solid #DC2626;color:#DC2626;border-radius:var(--radius-sm);padding:8px 16px;font-size:13px;font-family:'DM Sans',sans-serif;cursor:pointer;white-space:nowrap;font-weight:500">Delete account</button>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+function saveProfile() {
+  const btn = event.target;
+  btn.textContent = 'Saving...';
+  btn.disabled = true;
+  setTimeout(() => {
+    btn.textContent = '✓ Saved';
+    btn.style.background = '#059669';
+    document.getElementById('successMsg').style.display = 'block';
+    setTimeout(() => {
+      btn.textContent = 'Save changes';
+      btn.style.background = '';
+      btn.disabled = false;
+      document.getElementById('successMsg').style.display = 'none';
+    }, 2500);
+  }, 1000);
+}
+
+function confirmDelete() {
+  if(confirm('Are you absolutely sure? This will permanently delete your account and all data. This cannot be undone.')) {
+    alert('Please contact support@independence.nz to complete account deletion.');
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Bookings — Independence NZ</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .page-bg { background: var(--bg); min-height: 100vh; padding-bottom: 60px; }
+    .booking-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; margin-bottom: 14px; }
+    .booking-top { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+    .booking-icon { width: 48px; height: 48px; border-radius: 12px; background: var(--brand-light); display: flex; align-items: center; justify-content: center; font-size: 24px; flex-shrink: 0; }
+    .booking-details { display: grid; grid-template-columns: repeat(3,1fr); gap: 12px; background: var(--bg); border-radius: 10px; padding: 14px; margin-bottom: 14px; }
+    .detail-label { font-size: 11px; color: var(--text3); margin-bottom: 3px; }
+    .detail-value { font-size: 13px; font-weight: 500; }
+    .booking-actions { display: flex; align-items: center; gap: 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+    .booking-actions a, .booking-actions button { font-size: 13px; font-family: 'DM Sans', sans-serif; cursor: pointer; text-decoration: none; }
+    .section-label { font-size: 13px; font-weight: 500; color: var(--text2); margin: 24px 0 12px; display: flex; align-items: center; gap: 8px; }
+    .section-label::before { content: ''; width: 8px; height: 8px; border-radius: 50%; background: var(--brand); }
+    .section-label.past::before { background: var(--text3); }
+    .filter-row { display: flex; gap: 8px; margin-bottom: 20px; }
+    .filter-btn { border: 1.5px solid var(--border); background: white; border-radius: 24px; padding: 6px 14px; font-size: 13px; cursor: pointer; font-family: 'DM Sans', sans-serif; color: var(--text2); transition: all 0.12s; }
+    .filter-btn.active { background: var(--brand); color: white; border-color: var(--brand); }
+  </style>
+</head>
+<body class="page-bg">
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="nav-links"><a href="browse.html">Browse Services</a></div>
+      <div class="nav-actions">
+        <span style="font-size:14px;color:var(--text2)">Margaret S.</span>
+        <div class="avatar" style="background:var(--brand-light);color:var(--brand)">MS</div>
+        <a href="index.html" class="btn btn-secondary btn-sm">Sign out</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="container">
+  <div class="account-layout" style="padding-top:32px">
+    <aside class="sidebar">
+      <div class="card sidebar-profile" style="margin-bottom:8px">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="avatar avatar-lg" style="background:var(--brand-light);color:var(--brand)">MS</div>
+          <div>
+            <div style="font-size:15px;font-weight:500">Margaret Smith</div>
+            <div style="font-size:12px;color:var(--text3)">margaret@email.com</div>
+          </div>
+        </div>
+      </div>
+      <div class="card sidebar-nav">
+        <a href="account.html"><span class="nav-icon">📊</span> Overview</a>
+        <a href="account-bookings.html" class="active"><span class="nav-icon">📋</span> My Bookings</a>
+        <a href="account-reviews.html"><span class="nav-icon">⭐</span> My Reviews</a>
+        <a href="account-saved.html"><span class="nav-icon">❤️</span> Saved Providers</a>
+        <a href="account-notifications.html"><span class="nav-icon">🔔</span> Notifications</a>
+        <a href="account-settings.html"><span class="nav-icon">⚙️</span> Account Settings</a>
+        <a href="account-security.html"><span class="nav-icon">🔒</span> Security</a>
+      </div>
+    </aside>
+
+    <main>
+      <div style="display:flex;align-items:baseline;justify-content:space-between;padding:32px 0 20px">
+        <div><h1 style="font-size:26px;font-weight:500">My Bookings</h1><p style="font-size:14px;color:var(--text3);margin-top:4px">View and manage all your service bookings.</p></div>
+        <a href="browse.html" class="btn btn-primary btn-sm">+ Book a service</a>
+      </div>
+
+      <div class="filter-row">
+        <button class="filter-btn active" onclick="setFilter('all',this)">All</button>
+        <button class="filter-btn" onclick="setFilter('upcoming',this)">Upcoming</button>
+        <button class="filter-btn" onclick="setFilter('completed',this)">Completed</button>
+        <button class="filter-btn" onclick="setFilter('cancelled',this)">Cancelled</button>
+      </div>
+
+      <div id="bookingsList">
+        <!-- Upcoming -->
+        <div class="section-label" id="upcomingLabel">Upcoming</div>
+
+        <div class="booking-card" data-status="upcoming">
+          <div class="booking-top">
+            <div class="booking-icon">🧹</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">Standard clean</div>
+              <div style="font-size:13px;color:var(--text3)">Pristine Home Services</div>
+            </div>
+            <span class="badge badge-green">Confirmed</span>
+          </div>
+          <div class="booking-details">
+            <div><div class="detail-label">Date</div><div class="detail-value">16 Jul 2025</div></div>
+            <div><div class="detail-label">Time</div><div class="detail-value">9:00 AM</div></div>
+            <div><div class="detail-label">Amount paid</div><div class="detail-value">$85.00</div></div>
+          </div>
+          <div class="booking-actions">
+            <a href="provider.html" style="color:var(--brand);font-weight:500">View provider →</a>
+            <button style="color:var(--text3);background:none;border:none;margin-left:auto" onclick="cancelBooking(this)">Cancel booking</button>
+          </div>
+        </div>
+
+        <div class="booking-card" data-status="upcoming">
+          <div class="booking-top">
+            <div class="booking-icon">🌿</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">Garden maintenance</div>
+              <div style="font-size:13px;color:var(--text3)">Green Thumb Gardens</div>
+            </div>
+            <span class="badge badge-amber">Pending</span>
+          </div>
+          <div class="booking-details">
+            <div><div class="detail-label">Date</div><div class="detail-value">17 Jul 2025</div></div>
+            <div><div class="detail-label">Time</div><div class="detail-value">9:00 AM</div></div>
+            <div><div class="detail-label">Amount paid</div><div class="detail-value">$65.00</div></div>
+          </div>
+          <div class="booking-actions">
+            <a href="provider.html" style="color:var(--brand);font-weight:500">View provider →</a>
+            <button style="color:var(--text3);background:none;border:none;margin-left:auto" onclick="cancelBooking(this)">Cancel booking</button>
+          </div>
+        </div>
+
+        <!-- Past -->
+        <div class="section-label past" id="pastLabel">Past bookings</div>
+
+        <div class="booking-card" data-status="completed">
+          <div class="booking-top">
+            <div class="booking-icon">🧹</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">Deep clean</div>
+              <div style="font-size:13px;color:var(--text3)">Pristine Home Services</div>
+            </div>
+            <span class="badge badge-gray">Completed</span>
+          </div>
+          <div class="booking-details">
+            <div><div class="detail-label">Date</div><div class="detail-value">10 Jul 2025</div></div>
+            <div><div class="detail-label">Time</div><div class="detail-value">9:00 AM</div></div>
+            <div><div class="detail-label">Amount paid</div><div class="detail-value">$150.00</div></div>
+          </div>
+          <div class="booking-actions">
+            <button class="btn btn-sm" style="background:var(--accent-light);color:#92400E;border:none;font-family:'DM Sans',sans-serif;cursor:pointer" onclick="openReview('Pristine Home Services')">★ Leave a review</button>
+            <a href="provider.html" style="color:var(--brand);font-weight:500;margin-left:auto">Rebook →</a>
+          </div>
+        </div>
+
+        <div class="booking-card" data-status="completed">
+          <div class="booking-top">
+            <div class="booking-icon">🏃</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">Mobility session</div>
+              <div style="font-size:13px;color:var(--text3)">MoveBetter Health</div>
+            </div>
+            <span class="badge badge-gray">Completed</span>
+          </div>
+          <div class="booking-details">
+            <div><div class="detail-label">Date</div><div class="detail-value">5 Jul 2025</div></div>
+            <div><div class="detail-label">Time</div><div class="detail-value">10:00 AM</div></div>
+            <div><div class="detail-label">Amount paid</div><div class="detail-value">$90.00</div></div>
+          </div>
+          <div class="booking-actions">
+            <div style="display:flex;align-items:center;gap:6px;font-size:13px;color:var(--accent)">★★★★★ <span style="color:var(--text3)">Review submitted</span></div>
+            <a href="provider.html" style="color:var(--brand);font-weight:500;margin-left:auto">Rebook →</a>
+          </div>
+        </div>
+
+        <div class="booking-card" data-status="cancelled">
+          <div class="booking-top">
+            <div class="booking-icon">🔧</div>
+            <div style="flex:1">
+              <div style="font-size:15px;font-weight:500">Handyman repairs</div>
+              <div style="font-size:13px;color:var(--text3)">Reliable Handyman Co.</div>
+            </div>
+            <span class="badge" style="background:#FEF2F2;color:#DC2626">Cancelled</span>
+          </div>
+          <div class="booking-details">
+            <div><div class="detail-label">Date</div><div class="detail-value">1 Jul 2025</div></div>
+            <div><div class="detail-label">Time</div><div class="detail-value">2:00 PM</div></div>
+            <div><div class="detail-label">Refunded</div><div class="detail-value">$75.00</div></div>
+          </div>
+          <div class="booking-actions">
+            <a href="browse.html" style="color:var(--brand);font-weight:500">Find another provider →</a>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- REVIEW MODAL -->
+<div class="modal-overlay" id="reviewModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h3 id="reviewTitle" style="font-size:20px;font-weight:500">Rate your service</h3>
+      <button onclick="closeReview()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3)">×</button>
+    </div>
+    <div id="reviewContent">
+      <div style="display:flex;gap:8px;justify-content:center;margin-bottom:8px">
+        <button onclick="setRating(1)" class="star-btn" style="font-size:44px;background:none;border:none;cursor:pointer;color:#E5E7EB;transition:all 0.1s">★</button>
+        <button onclick="setRating(2)" class="star-btn" style="font-size:44px;background:none;border:none;cursor:pointer;color:#E5E7EB;transition:all 0.1s">★</button>
+        <button onclick="setRating(3)" class="star-btn" style="font-size:44px;background:none;border:none;cursor:pointer;color:#E5E7EB;transition:all 0.1s">★</button>
+        <button onclick="setRating(4)" class="star-btn" style="font-size:44px;background:none;border:none;cursor:pointer;color:#E5E7EB;transition:all 0.1s">★</button>
+        <button onclick="setRating(5)" class="star-btn" style="font-size:44px;background:none;border:none;cursor:pointer;color:#E5E7EB;transition:all 0.1s">★</button>
+      </div>
+      <p id="ratingLabel" style="text-align:center;font-size:14px;color:var(--text3);margin-bottom:20px">Tap to rate</p>
+      <div class="form-group">
+        <label class="label">Write a review (optional)</label>
+        <textarea class="input" style="resize:none;height:96px" placeholder="Tell others what you thought..."></textarea>
+      </div>
+      <button id="submitReviewBtn" class="btn btn-primary btn-full btn-lg" disabled onclick="submitReview()">Submit review</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const ratingLabels = ['','Poor','Fair','Good','Very good','Excellent!'];
+let currentRating = 0;
+
+function setFilter(f, el) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  const cards = document.querySelectorAll('.booking-card');
+  const ul = document.getElementById('upcomingLabel');
+  const pl = document.getElementById('pastLabel');
+  if(f==='all') { cards.forEach(c=>c.style.display=''); ul.style.display=''; pl.style.display=''; }
+  else {
+    cards.forEach(c=>{c.style.display = c.dataset.status===f ? '' : 'none';});
+    ul.style.display = f==='upcoming' ? '' : 'none';
+    pl.style.display = f==='upcoming' ? 'none' : '';
+  }
+}
+
+function cancelBooking(btn) {
+  if(confirm('Are you sure you want to cancel this booking? If eligible, a refund will be processed.')) {
+    const card = btn.closest('.booking-card');
+    card.querySelector('.badge').textContent = 'Cancelled';
+    card.querySelector('.badge').className = 'badge';
+    card.querySelector('.badge').style.cssText = 'background:#FEF2F2;color:#DC2626;display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:500;padding:4px 10px;border-radius:20px';
+    card.dataset.status = 'cancelled';
+    btn.parentElement.innerHTML = '<span style="font-size:13px;color:var(--text3)">Booking cancelled</span>';
+  }
+}
+
+function openReview(name) { document.getElementById('reviewTitle').textContent='Rate — '+name; document.getElementById('reviewModal').classList.add('open'); }
+function closeReview() { document.getElementById('reviewModal').classList.remove('open'); currentRating=0; document.querySelectorAll('.star-btn').forEach(b=>{b.style.color='#E5E7EB';b.style.transform='scale(1)';}); }
+document.getElementById('reviewModal').addEventListener('click', e=>{if(e.target===e.currentTarget)closeReview();});
+
+function setRating(n) {
+  currentRating=n;
+  document.querySelectorAll('.star-btn').forEach((b,i)=>{b.style.color=i<n?'#F59E0B':'#E5E7EB';b.style.transform=i<n?'scale(1.1)':'scale(1)';});
+  document.getElementById('ratingLabel').textContent=ratingLabels[n];
+  document.getElementById('submitReviewBtn').disabled=false;
+}
+
+function submitReview() {
+  document.getElementById('reviewContent').innerHTML=`<div style="text-align:center;padding:32px 0"><div style="font-size:56px;margin-bottom:16px">⭐</div><h3 style="font-size:22px;font-weight:500;color:var(--brand);margin-bottom:8px">Thanks for your review!</h3><p style="font-size:14px;color:var(--text3)">Your feedback helps others find the best providers.</p><button onclick="closeReview()" class="btn btn-primary" style="margin-top:20px">Done</button></div>`;
+}
+</script>
+</body>
+</html>

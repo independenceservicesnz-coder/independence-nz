@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pristine Home Services — Independence NZ</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .back-bar { padding: 14px 0; border-bottom: 1px solid var(--border); background: white; }
+    .back-link { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; color: var(--text2); text-decoration: none; transition: color 0.15s; }
+    .back-link:hover { color: var(--brand); }
+    .provider-cover { height: 200px; background: linear-gradient(135deg,#D1FAE5,#A7F3D0); display: flex; align-items: center; justify-content: center; font-size: 72px; border-radius: var(--radius); margin-bottom: 0; }
+    .profile-section { background: white; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; margin-bottom: 20px; }
+    .profile-header { padding: 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
+    .profile-name { font-size: 26px; font-weight: 500; margin-bottom: 4px; }
+    .profile-meta { font-size: 14px; color: var(--text3); margin-bottom: 12px; }
+    .profile-badges { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .rating-big { font-family: 'Fraunces', serif; font-size: 40px; font-weight: 500; color: var(--brand); line-height: 1; }
+    .profile-bio { padding: 20px 24px; font-size: 14px; color: var(--text2); line-height: 1.7; border-bottom: 1px solid var(--border); }
+    .section-title { font-size: 17px; font-weight: 500; padding: 20px 24px 16px; border-bottom: 1px solid #F9FAFB; }
+    .service-row { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; border-bottom: 1px solid var(--border); }
+    .service-row:last-child { border-bottom: none; }
+    .service-name { font-size: 14px; font-weight: 500; margin-bottom: 3px; }
+    .service-desc { font-size: 12px; color: var(--text3); }
+    .service-price { font-size: 16px; font-weight: 500; text-align: right; }
+    .service-duration { font-size: 11px; color: var(--text3); margin-bottom: 8px; text-align: right; }
+    .review-section { margin-bottom: 20px; }
+    .rating-summary { display: flex; align-items: center; gap: 28px; padding: 20px 24px; border-bottom: 1px solid var(--border); }
+    .rating-bars { flex: 1; }
+    .review-item { padding: 20px 24px; border-bottom: 1px solid var(--border); }
+    .review-item:last-child { border-bottom: none; }
+    .sticky-book { position: sticky; top: 80px; }
+    .book-card { background: white; border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
+    .book-card h3 { font-size: 17px; font-weight: 500; margin-bottom: 16px; }
+    .service-select { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+    .service-option { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 12px 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.12s; }
+    .service-option:hover { border-color: var(--brand); }
+    .service-option.selected { border-color: var(--brand); background: var(--brand-light); }
+    .service-option.selected .svc-name { color: var(--brand); }
+    .layout-with-sidebar { display: grid; grid-template-columns: 1fr 320px; gap: 24px; align-items: start; }
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0; padding: 0 24px 20px; }
+    .info-item { padding: 14px 0; border-bottom: 1px solid #F9FAFB; }
+    .info-item:nth-child(odd) { padding-right: 20px; border-right: 1px solid #F9FAFB; }
+    .info-item:nth-child(even) { padding-left: 20px; }
+    .info-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+    .info-value { font-size: 14px; font-weight: 500; }
+    @media (max-width: 900px) { .layout-with-sidebar { grid-template-columns: 1fr; } .sticky-book { position: static; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="nav-links">
+        <a href="browse.html">Browse Services</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="providers-join.html">For Providers</a>
+      </div>
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-secondary btn-sm">Sign in</a>
+        <a href="browse.html" class="btn btn-primary btn-sm">Book a Service</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="back-bar">
+  <div class="container">
+    <a href="browse.html" class="back-link">← Back to Browse Services</a>
+  </div>
+</div>
+
+<div class="container section-sm">
+  <div class="provider-cover" style="margin-bottom:20px">🧹</div>
+
+  <div class="layout-with-sidebar">
+    <!-- LEFT COLUMN -->
+    <div>
+      <!-- Profile header -->
+      <div class="profile-section">
+        <div class="profile-header">
+          <div>
+            <div class="profile-name">Pristine Home Services</div>
+            <div class="profile-meta">Home Cleaning · Auckland Central · 8 years experience</div>
+            <div class="profile-badges">
+              <span class="verified"><span class="verified-dot">✓</span> Verified Provider</span>
+              <span class="badge badge-amber">⭐ Top Rated</span>
+              <span class="badge badge-gray">🏆 Most Booked</span>
+            </div>
+          </div>
+          <div style="text-align:right;flex-shrink:0">
+            <div class="rating-big">4.9</div>
+            <div class="stars" style="font-size:18px">★★★★★</div>
+            <div style="font-size:13px;color:var(--text3);margin-top:4px">128 reviews</div>
+          </div>
+        </div>
+
+        <div class="profile-bio">
+          Pristine Home Services has been delivering reliable, thorough home cleaning across Auckland since 2016. All staff are police-checked, fully insured, and trained in safe practices for older adults and those with mobility considerations. We bring all our own products and equipment — you don't need to do a thing.
+        </div>
+
+        <div class="info-grid">
+          <div class="info-item"><div class="info-label">Location</div><div class="info-value">Auckland Central</div></div>
+          <div class="info-item"><div class="info-label">Service area</div><div class="info-value">Within 20km</div></div>
+          <div class="info-item"><div class="info-label">Experience</div><div class="info-value">8 years</div></div>
+          <div class="info-item"><div class="info-label">Total bookings</div><div class="info-value">340+</div></div>
+          <div class="info-item"><div class="info-label">Response time</div><div class="info-value">Within 2 hours</div></div>
+          <div class="info-item"><div class="info-label">Repeat customers</div><div class="info-value">84%</div></div>
+        </div>
+      </div>
+
+      <!-- Services -->
+      <div class="profile-section">
+        <div class="section-title">Services & pricing</div>
+        <div class="service-row">
+          <div>
+            <div class="service-name">Standard clean</div>
+            <div class="service-desc">Kitchen, bathrooms, living areas, vacuuming and mopping</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:20px">
+            <div class="service-duration">Approx 2–3 hours</div>
+            <div class="service-price">$85</div>
+            <button class="btn btn-primary btn-sm" onclick="openBooking('Standard clean',85)" style="margin-top:8px">Book</button>
+          </div>
+        </div>
+        <div class="service-row">
+          <div>
+            <div class="service-name">Deep clean</div>
+            <div class="service-desc">Full home including inside appliances, cupboards, windows</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:20px">
+            <div class="service-duration">Approx 4–5 hours</div>
+            <div class="service-price">$150</div>
+            <button class="btn btn-primary btn-sm" onclick="openBooking('Deep clean',150)" style="margin-top:8px">Book</button>
+          </div>
+        </div>
+        <div class="service-row">
+          <div>
+            <div class="service-name">Fortnightly maintenance</div>
+            <div class="service-desc">Recurring standard clean every two weeks</div>
+          </div>
+          <div style="text-align:right;flex-shrink:0;margin-left:20px">
+            <div class="service-duration">Approx 2 hours</div>
+            <div class="service-price">$75 <span style="font-size:12px;color:var(--text3)">/visit</span></div>
+            <button class="btn btn-primary btn-sm" onclick="openBooking('Fortnightly maintenance',75)" style="margin-top:8px">Book</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div class="profile-section review-section">
+        <div class="rating-summary">
+          <div style="text-align:center">
+            <div class="rating-big">4.9</div>
+            <div class="stars" style="font-size:18px">★★★★★</div>
+            <div style="font-size:13px;color:var(--text3);margin-top:4px">128 reviews</div>
+          </div>
+          <div class="rating-bars" style="flex:1">
+            <div class="rating-bar-row"><span style="font-size:12px;color:var(--text3);width:24px">5★</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:88%"></div></div><span style="font-size:12px;color:var(--text3)">88%</span></div>
+            <div class="rating-bar-row"><span style="font-size:12px;color:var(--text3);width:24px">4★</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:9%"></div></div><span style="font-size:12px;color:var(--text3)">9%</span></div>
+            <div class="rating-bar-row"><span style="font-size:12px;color:var(--text3);width:24px">3★</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:3%"></div></div><span style="font-size:12px;color:var(--text3)">3%</span></div>
+            <div class="rating-bar-row"><span style="font-size:12px;color:var(--text3);width:24px">2★</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%"></div></div><span style="font-size:12px;color:var(--text3)">0%</span></div>
+            <div class="rating-bar-row"><span style="font-size:12px;color:var(--text3);width:24px">1★</span><div class="rating-bar-track"><div class="rating-bar-fill" style="width:0%"></div></div><span style="font-size:12px;color:var(--text3)">0%</span></div>
+          </div>
+        </div>
+        <div class="review-item">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div class="avatar" style="background:#D1FAE5;color:#065F46">MK</div>
+            <div><div style="font-size:14px;font-weight:500">Margaret K.</div><div style="font-size:12px;color:var(--text3)">3 days ago</div></div>
+            <div class="stars" style="margin-left:auto;font-size:15px">★★★★★</div>
+          </div>
+          <p style="font-size:14px;color:var(--text2);line-height:1.6">"Absolutely wonderful. Our home hasn't been this clean in years. They were thorough, friendly, and so careful around Mum's things. We've already booked again."</p>
+          <div style="font-size:12px;color:var(--brand);font-weight:500;margin-top:8px">✓ Standard clean · Verified booking</div>
+        </div>
+        <div class="review-item">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div class="avatar" style="background:#EDE9FE;color:#5B21B6">SL</div>
+            <div><div style="font-size:14px;font-weight:500">Susan L.</div><div style="font-size:12px;color:var(--text3)">1 week ago</div></div>
+            <div class="stars" style="margin-left:auto;font-size:15px">★★★★★</div>
+          </div>
+          <p style="font-size:14px;color:var(--text2);line-height:1.6">"Reliable, thorough, and so kind with Mum. I feel completely at ease knowing they're coming fortnightly. Highly recommend to any family in a similar situation."</p>
+          <div style="font-size:12px;color:var(--brand);font-weight:500;margin-top:8px">✓ Fortnightly maintenance · Verified booking</div>
+        </div>
+        <div class="review-item">
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px">
+            <div class="avatar" style="background:#FEF3C7;color:#92400E">RJ</div>
+            <div><div style="font-size:14px;font-weight:500">Robert J.</div><div style="font-size:12px;color:var(--text3)">2 weeks ago</div></div>
+            <div class="stars" style="margin-left:auto;font-size:15px">★★★★★</div>
+          </div>
+          <p style="font-size:14px;color:var(--text2);line-height:1.6">"Easy to book, turned up on time, did an excellent job. The Independence NZ platform made it really easy to compare providers — very glad we found Pristine."</p>
+          <div style="font-size:12px;color:var(--brand);font-weight:500;margin-top:8px">✓ Deep clean · Verified booking</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT COLUMN (sticky book card) -->
+    <div class="sticky-book">
+      <div class="book-card">
+        <h3>Book this provider</h3>
+        <div class="service-select">
+          <div class="service-option selected" onclick="selectSvc(this,'Standard clean',85)">
+            <div><div class="svc-name" style="font-size:13px;font-weight:500;color:var(--brand)">Standard clean</div><div style="font-size:11px;color:var(--text3)">Approx 2–3 hours</div></div>
+            <div style="font-weight:500;font-size:14px;color:var(--brand)">$85</div>
+          </div>
+          <div class="service-option" onclick="selectSvc(this,'Deep clean',150)">
+            <div><div class="svc-name" style="font-size:13px;font-weight:500">Deep clean</div><div style="font-size:11px;color:var(--text3)">Approx 4–5 hours</div></div>
+            <div style="font-weight:500;font-size:14px">$150</div>
+          </div>
+          <div class="service-option" onclick="selectSvc(this,'Fortnightly maintenance',75)">
+            <div><div class="svc-name" style="font-size:13px;font-weight:500">Fortnightly</div><div style="font-size:11px;color:var(--text3)">Approx 2 hours</div></div>
+            <div style="font-weight:500;font-size:14px">$75</div>
+          </div>
+        </div>
+
+        <div style="font-size:13px;font-weight:500;color:var(--text2);margin-bottom:10px">Next availability</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px">
+          <div class="slot selected" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Tomorrow</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">1:00 PM</div><div class="slot-date">Tomorrow</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">11:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+        </div>
+
+        <div style="background:var(--bg);border-radius:10px;padding:14px;margin-bottom:16px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px"><span id="svcLabel2">Standard clean</span><span id="svcPrice2">$85.00</span></div>
+          <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500"><span>Total</span><span id="totalPrice2">$85.00</span></div>
+          <div style="font-size:11px;color:var(--text3);margin-top:8px">💳 Secure payment through Independence NZ</div>
+        </div>
+
+        <a href="auth.html" class="btn btn-primary btn-full" style="padding:14px;font-size:15px;border-radius:10px">Sign in to book →</a>
+        <div style="text-align:center;font-size:12px;color:var(--text3);margin-top:12px">No charges until confirmed</div>
+      </div>
+
+      <div style="background:var(--brand-light);border-radius:var(--radius);padding:16px;margin-top:14px">
+        <div style="font-size:13px;font-weight:500;color:var(--brand);margin-bottom:8px">🛡️ Your booking is protected</div>
+        <ul style="font-size:12px;color:var(--brand-dark);line-height:1.8;list-style:none">
+          <li>✓ All payments through Independence NZ</li>
+          <li>✓ Vetted and verified provider</li>
+          <li>✓ Customer support if anything goes wrong</li>
+          <li>✓ Reviews from real verified bookings only</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h3 id="modalTitle" style="font-size:20px;font-weight:500">Book Service</h3>
+      <button onclick="closeBooking()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3)">×</button>
+    </div>
+    <div class="form-group">
+      <div class="label" style="margin-bottom:10px">Choose a time</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div class="slot selected" onclick="selectSlotM(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Tomorrow</div></div>
+        <div class="slot" onclick="selectSlotM(this)"><div class="slot-time">1:00 PM</div><div class="slot-date">Tomorrow</div></div>
+        <div class="slot" onclick="selectSlotM(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+        <div class="slot" onclick="selectSlotM(this)"><div class="slot-time">11:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+        <div class="slot" onclick="selectSlotM(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Fri 18 Jul</div></div>
+        <div class="slot" onclick="selectSlotM(this)"><div class="slot-time">2:00 PM</div><div class="slot-date">Fri 18 Jul</div></div>
+      </div>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:14px;margin:16px 0">
+      <div style="display:flex;justify-content:space-between;font-size:13px;color:var(--text2);margin-bottom:6px"><span id="mSvc">Standard clean</span><span id="mPrice">$85.00</span></div>
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500"><span>Total</span><span id="mTotal">$85.00</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">💳 Secure payment through Independence NZ</div>
+    </div>
+    <a href="auth.html" class="btn btn-primary btn-full btn-lg">Sign in to book →</a>
+  </div>
+</div>
+
+<footer style="margin-top:60px">
+  <div class="container">
+    <div class="footer-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="footer-links"><a href="browse.html">Browse</a><a href="providers-join.html">For Providers</a><a href="#">Terms</a><a href="#">Privacy</a></div>
+      <div class="footer-copy">© 2025 Independence NZ</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+function openBooking(svc, price) {
+  document.getElementById('modalTitle').textContent = 'Book — ' + svc;
+  document.getElementById('mSvc').textContent = svc;
+  document.getElementById('mPrice').textContent = '$' + price + '.00';
+  document.getElementById('mTotal').textContent = '$' + price + '.00';
+  document.getElementById('bookingModal').classList.add('open');
+}
+function closeBooking() { document.getElementById('bookingModal').classList.remove('open'); }
+document.getElementById('bookingModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeBooking(); });
+function selectSlotM(el) { document.querySelectorAll('#bookingModal .slot').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); }
+function selectSlot(el) { const parent = el.closest('.book-card'); parent.querySelectorAll('.slot').forEach(s=>s.classList.remove('selected')); el.classList.add('selected'); }
+function selectSvc(el, name, price) {
+  document.querySelectorAll('.service-option').forEach(o=>{o.classList.remove('selected'); o.querySelector('.svc-name').style.color='var(--text)';});
+  el.classList.add('selected');
+  el.querySelector('.svc-name').style.color='var(--brand)';
+  document.getElementById('svcLabel2').textContent = name;
+  document.getElementById('svcPrice2').textContent = '$' + price + '.00';
+  document.getElementById('totalPrice2').textContent = '$' + price + '.00';
+}
+</script>
+</body>
+</html>

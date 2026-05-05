@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Independence NZ — Trusted Home Services Marketplace</title>
+  <meta name="description" content="Book trusted local home services. Stay independent for longer. Browse vetted providers, book in minutes, pay securely.">
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Hero */
+    .hero { background: linear-gradient(140deg, var(--brand-dark) 0%, var(--brand) 55%, var(--brand-mid) 100%); color: white; padding: 80px 0 72px; text-align: center; position: relative; overflow: hidden; }
+    .hero::before { content: ''; position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+    .hero-badge { display: inline-flex; align-items: center; gap: 8px; background: rgba(255,255,255,0.15); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.2); padding: 6px 16px; border-radius: 24px; font-size: 13px; margin-bottom: 24px; }
+    .hero h1 { font-size: clamp(36px, 5vw, 58px); font-weight: 500; margin-bottom: 18px; max-width: 700px; margin-left: auto; margin-right: auto; }
+    .hero h1 em { font-style: italic; color: #A8EDC8; }
+    .hero p { font-size: 17px; opacity: 0.82; max-width: 500px; margin: 0 auto 36px; line-height: 1.6; }
+    .hero-search { display: flex; gap: 0; max-width: 520px; margin: 0 auto 24px; background: white; border-radius: 12px; padding: 6px 6px 6px 20px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); align-items: center; }
+    .hero-search input { flex: 1; border: none; outline: none; font-size: 15px; font-family: 'DM Sans', sans-serif; color: var(--text); background: transparent; }
+    .hero-search input::placeholder { color: var(--text3); }
+    .hero-search button { background: var(--brand); color: white; border: none; border-radius: 8px; padding: 12px 22px; font-size: 14px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; white-space: nowrap; transition: background 0.15s; }
+    .hero-search button:hover { background: var(--brand-dark); }
+    .hero-trust { display: flex; justify-content: center; gap: 28px; font-size: 13px; opacity: 0.75; flex-wrap: wrap; }
+    .hero-trust span { display: flex; align-items: center; gap: 6px; }
+    .hero-stats { display: flex; justify-content: center; gap: 48px; margin-top: 40px; padding-top: 40px; border-top: 1px solid rgba(255,255,255,0.15); flex-wrap: wrap; }
+    .hero-stat-value { font-family: 'Fraunces', serif; font-size: 30px; font-weight: 500; display: block; }
+    .hero-stat-label { font-size: 12px; opacity: 0.7; margin-top: 2px; }
+
+    /* Categories */
+    .cat-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+    .cat-card { background: white; border-radius: var(--radius); border: 1.5px solid var(--border); padding: 20px 12px; text-align: center; cursor: pointer; transition: all 0.15s; text-decoration: none; display: block; }
+    .cat-card:hover { border-color: var(--brand); box-shadow: var(--shadow); transform: translateY(-2px); }
+    .cat-card.featured { border-color: var(--brand); background: linear-gradient(135deg, white 70%, var(--brand-light)); }
+    .cat-icon { font-size: 32px; margin-bottom: 10px; }
+    .cat-name { font-size: 13px; font-weight: 500; color: var(--text); margin-bottom: 4px; }
+    .cat-count { font-size: 11px; color: var(--text3); }
+    .cat-badge { display: inline-block; background: var(--brand); color: white; font-size: 10px; font-weight: 500; padding: 2px 8px; border-radius: 10px; margin-bottom: 8px; }
+
+    /* How it works */
+    .how-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; }
+    .how-step { text-align: center; padding: 0 20px; position: relative; }
+    .how-step:not(:last-child)::after { content: '→'; position: absolute; right: -12px; top: 24px; color: var(--border); font-size: 20px; }
+    .step-num { width: 52px; height: 52px; border-radius: 50%; background: var(--brand-light); color: var(--brand); font-family: 'Fraunces', serif; font-size: 20px; font-weight: 600; display: flex; align-items: center; justify-content: center; margin: 0 auto 16px; }
+    .step-title { font-size: 15px; font-weight: 500; margin-bottom: 8px; }
+    .step-desc { font-size: 13px; color: var(--text3); line-height: 1.5; }
+
+    /* Reviews */
+    .review-card { background: white; border-radius: var(--radius); border: 1px solid var(--border); padding: 20px; }
+    .review-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+    .reviewer-info { flex: 1; }
+    .reviewer-name { font-size: 14px; font-weight: 500; }
+    .review-date { font-size: 12px; color: var(--text3); }
+    .review-text { font-size: 14px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; }
+    .review-service-tag { font-size: 12px; color: var(--brand); font-weight: 500; }
+
+    /* Provider CTA */
+    .provider-cta { background: linear-gradient(135deg, var(--brand-dark), var(--brand)); border-radius: 20px; padding: 52px 48px; display: flex; justify-content: space-between; align-items: center; gap: 32px; color: white; }
+    .provider-cta-text h2 { font-size: 32px; font-weight: 500; margin-bottom: 10px; }
+    .provider-cta-text p { opacity: 0.75; max-width: 380px; font-size: 15px; line-height: 1.6; }
+    .provider-cta-right { text-align: center; flex-shrink: 0; }
+    .provider-cta-sub { font-size: 12px; opacity: 0.6; margin-top: 8px; }
+
+    /* Trust strip */
+    .trust-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); background: white; }
+    .trust-item { padding: 28px 24px; text-align: center; border-right: 1px solid var(--border); }
+    .trust-item:last-child { border-right: none; }
+    .trust-icon-wrap { font-size: 28px; margin-bottom: 10px; }
+    .trust-label { font-size: 14px; font-weight: 500; margin-bottom: 4px; }
+    .trust-sub { font-size: 12px; color: var(--text3); }
+
+    @media (max-width: 900px) {
+      .cat-grid { grid-template-columns: repeat(3, 1fr); }
+      .how-grid { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+      .how-step::after { display: none; }
+      .provider-cta { flex-direction: column; text-align: center; padding: 36px 24px; }
+      .provider-cta-text p { margin: 0 auto; }
+      .trust-strip { grid-template-columns: repeat(2, 1fr); }
+      .trust-item:nth-child(2) { border-right: none; }
+      .hero-stats { gap: 28px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="nav-links">
+        <a href="browse.html">Browse Services</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="providers-join.html">For Providers</a>
+      </div>
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-secondary btn-sm">Sign in</a>
+        <a href="browse.html" class="btn btn-primary btn-sm">Book a Service</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="container" style="position:relative;z-index:1">
+    <div class="hero-badge fade-up">✦ New Zealand's trusted home services marketplace</div>
+    <h1 class="fade-up-delay-1">Book trusted services.<br><em>Stay independent</em> for longer.</h1>
+    <p class="fade-up-delay-2">Browse vetted local providers, book in minutes, and pay securely — all in one place.</p>
+    <div class="hero-search fade-up-delay-2">
+      <input type="text" placeholder="What service do you need?" id="heroSearch">
+      <button onclick="doSearch()">Find Services →</button>
+    </div>
+    <div class="hero-trust fade-up-delay-3">
+      <span>★ 4.9 avg rating</span>
+      <span>· 200+ vetted providers</span>
+      <span>· Secure NZ payments</span>
+      <span>· No membership fee</span>
+    </div>
+    <div class="hero-stats fade-up-delay-3">
+      <div><span class="hero-stat-value">2,400+</span><div class="hero-stat-label">Happy customers</div></div>
+      <div><span class="hero-stat-value">200+</span><div class="hero-stat-label">Vetted providers</div></div>
+      <div><span class="hero-stat-value">4.9★</span><div class="hero-stat-label">Average rating</div></div>
+      <div><span class="hero-stat-value">98%</span><div class="hero-stat-label">Booking satisfaction</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- CATEGORIES -->
+<section class="section">
+  <div class="container">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px">
+      <h2 style="font-size:28px;font-weight:500">Browse by service</h2>
+      <a href="browse.html" style="font-size:14px;color:var(--brand);text-decoration:none;font-weight:500">See all services →</a>
+    </div>
+    <div class="cat-grid">
+      <a href="browse.html?cat=cleaning" class="cat-card featured">
+        <div class="cat-badge">Popular</div>
+        <div class="cat-icon">🧹</div>
+        <div class="cat-name">Home Cleaning</div>
+        <div class="cat-count">42 providers</div>
+      </a>
+      <a href="browse.html?cat=gardening" class="cat-card">
+        <div class="cat-icon">🌿</div>
+        <div class="cat-name">Gardening</div>
+        <div class="cat-count">28 providers</div>
+      </a>
+      <a href="browse.html?cat=handyman" class="cat-card">
+        <div class="cat-icon">🔧</div>
+        <div class="cat-name">Handyman</div>
+        <div class="cat-count">31 providers</div>
+      </a>
+      <a href="browse.html?cat=fitness" class="cat-card">
+        <div class="cat-icon">🏃</div>
+        <div class="cat-name">Fitness & Mobility</div>
+        <div class="cat-count">19 providers</div>
+      </a>
+      <a href="browse.html?cat=care" class="cat-card">
+        <div class="cat-icon">❤️</div>
+        <div class="cat-name">Personal Care</div>
+        <div class="cat-count">14 providers</div>
+      </a>
+      <a href="browse.html?cat=transport" class="cat-card">
+        <div class="cat-icon">🚗</div>
+        <div class="cat-name">Transport</div>
+        <div class="cat-count">11 providers</div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- TOP PROVIDERS -->
+<section class="section" style="padding-top:0">
+  <div class="container">
+    <div style="display:flex;align-items:baseline;justify-content:space-between;margin-bottom:32px">
+      <h2 style="font-size:28px;font-weight:500">Top-rated providers near you</h2>
+      <a href="browse.html" style="font-size:14px;color:var(--brand);text-decoration:none;font-weight:500">View all →</a>
+    </div>
+    <div class="grid-4">
+      <a href="provider.html" class="provider-card">
+        <div class="provider-thumb" style="background:linear-gradient(135deg,#D1FAE5,#A7F3D0)">🧹
+          <span style="position:absolute;top:10px;left:10px" class="verified"><span class="verified-dot">✓</span> Verified</span>
+          <span style="position:absolute;top:10px;right:10px" class="badge badge-amber">⭐ Top Rated</span>
+        </div>
+        <div class="provider-body">
+          <div class="provider-name">Pristine Home Services</div>
+          <div class="provider-meta">Home Cleaning · Auckland Central</div>
+          <div class="provider-rating-row">
+            <span class="stars">★★★★★</span>
+            <span style="font-size:13px;font-weight:500">4.9</span>
+            <span style="font-size:12px;color:var(--text3)">(128)</span>
+          </div>
+          <div class="provider-price">From <strong>$85 / visit</strong></div>
+          <div class="provider-footer">
+            <span class="avail">Available tomorrow</span>
+            <button class="btn btn-primary btn-sm" onclick="event.preventDefault();openBooking()">Book now</button>
+          </div>
+        </div>
+      </a>
+
+      <a href="provider.html" class="provider-card">
+        <div class="provider-thumb" style="background:linear-gradient(135deg,#D1FAE5,#FEF3C7)">🌿
+          <span style="position:absolute;top:10px;left:10px" class="verified"><span class="verified-dot">✓</span> Verified</span>
+        </div>
+        <div class="provider-body">
+          <div class="provider-name">Green Thumb Gardens</div>
+          <div class="provider-meta">Gardening · North Shore</div>
+          <div class="provider-rating-row">
+            <span class="stars">★★★★★</span>
+            <span style="font-size:13px;font-weight:500">4.8</span>
+            <span style="font-size:12px;color:var(--text3)">(94)</span>
+          </div>
+          <div class="provider-price">From <strong>$65 / hour</strong></div>
+          <div class="provider-footer">
+            <span class="avail">Available Friday</span>
+            <button class="btn btn-primary btn-sm" onclick="event.preventDefault();openBooking()">Book now</button>
+          </div>
+        </div>
+      </a>
+
+      <a href="provider.html" class="provider-card">
+        <div class="provider-thumb" style="background:linear-gradient(135deg,#EDE9FE,#DDD6FE)">🔧
+          <span style="position:absolute;top:10px;left:10px" class="verified"><span class="verified-dot">✓</span> Verified</span>
+        </div>
+        <div class="provider-body">
+          <div class="provider-name">Reliable Handyman Co.</div>
+          <div class="provider-meta">Handyman · Manukau</div>
+          <div class="provider-rating-row">
+            <span class="stars">★★★★★</span>
+            <span style="font-size:13px;font-weight:500">4.7</span>
+            <span style="font-size:12px;color:var(--text3)">(61)</span>
+          </div>
+          <div class="provider-price">From <strong>$75 / hour</strong></div>
+          <div class="provider-footer">
+            <span class="avail">Available Monday</span>
+            <button class="btn btn-primary btn-sm" onclick="event.preventDefault();openBooking()">Book now</button>
+          </div>
+        </div>
+      </a>
+
+      <a href="provider.html" class="provider-card">
+        <div class="provider-thumb" style="background:linear-gradient(135deg,#FEE2E2,#FECDD3)">🏃
+          <span style="position:absolute;top:10px;left:10px" class="verified"><span class="verified-dot">✓</span> Verified</span>
+          <span style="position:absolute;top:10px;right:10px" class="badge badge-amber">⭐ Top Rated</span>
+        </div>
+        <div class="provider-body">
+          <div class="provider-name">MoveBetter Health</div>
+          <div class="provider-meta">Fitness & Mobility · Remuera</div>
+          <div class="provider-rating-row">
+            <span class="stars">★★★★★</span>
+            <span style="font-size:13px;font-weight:500">5.0</span>
+            <span style="font-size:12px;color:var(--text3)">(47)</span>
+          </div>
+          <div class="provider-price">From <strong>$90 / session</strong></div>
+          <div class="provider-footer">
+            <span class="avail">Available today</span>
+            <button class="btn btn-primary btn-sm" onclick="event.preventDefault();openBooking()">Book now</button>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="section" style="background:white">
+  <div class="container">
+    <h2 style="font-size:28px;font-weight:500;text-align:center;margin-bottom:48px">How Independence NZ works</h2>
+    <div class="how-grid">
+      <div class="how-step">
+        <div class="step-num">1</div>
+        <div class="step-title">Choose a service</div>
+        <div class="step-desc">Browse by category or search for exactly what you need</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">2</div>
+        <div class="step-title">Pick a provider</div>
+        <div class="step-desc">Compare star ratings, read verified reviews, check availability</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">3</div>
+        <div class="step-title">Book & pay securely</div>
+        <div class="step-desc">Choose a time slot and pay safely through Independence NZ</div>
+      </div>
+      <div class="how-step">
+        <div class="step-num">4</div>
+        <div class="step-title">Rate your service</div>
+        <div class="step-desc">Leave a star rating after your service to help others choose</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+  <div class="trust-item">
+    <div class="trust-icon-wrap">🔒</div>
+    <div class="trust-label">Secure payments</div>
+    <div class="trust-sub">All payments processed through Independence NZ</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon-wrap">✅</div>
+    <div class="trust-label">Vetted providers</div>
+    <div class="trust-sub">Every provider is background checked and verified</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon-wrap">⭐</div>
+    <div class="trust-label">Verified reviews</div>
+    <div class="trust-sub">Reviews only from customers with real bookings</div>
+  </div>
+  <div class="trust-item">
+    <div class="trust-icon-wrap">📞</div>
+    <div class="trust-label">NZ-based support</div>
+    <div class="trust-sub">Local team here to help whenever you need</div>
+  </div>
+</div>
+
+<!-- REVIEWS -->
+<section class="section">
+  <div class="container">
+    <h2 style="font-size:28px;font-weight:500;text-align:center;margin-bottom:40px">What customers are saying</h2>
+    <div class="grid-3">
+      <div class="review-card">
+        <div class="review-header">
+          <div class="avatar" style="background:#D1FAE5;color:#065F46">MK</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Margaret K.</div>
+            <div class="review-date">3 days ago · Auckland</div>
+          </div>
+        </div>
+        <div class="stars" style="font-size:16px;margin-bottom:10px">★★★★★</div>
+        <div class="review-text">"Absolutely wonderful service. Pristine Home did such a thorough job — our house hasn't been this clean in years. Booking through Independence NZ was so easy."</div>
+        <div class="review-service-tag">✓ Home Cleaning · Verified booking</div>
+      </div>
+      <div class="review-card">
+        <div class="review-header">
+          <div class="avatar" style="background:#FEF3C7;color:#92400E">RJ</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Robert J.</div>
+            <div class="review-date">1 week ago · North Shore</div>
+          </div>
+        </div>
+        <div class="stars" style="font-size:16px;margin-bottom:10px">★★★★★</div>
+        <div class="review-text">"My mum lives alone and we needed someone trustworthy for her garden. Green Thumb Gardens were perfect — reliable, kind, and did great work every visit."</div>
+        <div class="review-service-tag">✓ Gardening · Verified booking</div>
+      </div>
+      <div class="review-card">
+        <div class="review-header">
+          <div class="avatar" style="background:#EDE9FE;color:#5B21B6">SL</div>
+          <div class="reviewer-info">
+            <div class="reviewer-name">Susan L.</div>
+            <div class="review-date">2 weeks ago · Remuera</div>
+          </div>
+        </div>
+        <div class="stars" style="font-size:16px;margin-bottom:10px">★★★★★</div>
+        <div class="review-text">"Being able to compare providers, read real reviews, and book all in one place is exactly what I needed. We've already rebooked twice. Highly recommend."</div>
+        <div class="review-service-tag">✓ Home Cleaning · Verified booking</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PROVIDER CTA -->
+<section class="section-sm">
+  <div class="container">
+    <div class="provider-cta">
+      <div class="provider-cta-text">
+        <h2>Grow your business with Independence NZ</h2>
+        <p>Join 200+ vetted local providers accessing consistent customers through our trusted marketplace. One flat monthly fee — no commission on any booking.</p>
+      </div>
+      <div class="provider-cta-right">
+        <a href="providers-join.html" class="btn btn-white btn-lg">Become a Provider</a>
+        <div class="provider-cta-sub">Flat monthly subscription · Keep 100% of earnings</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="footer-links">
+        <a href="browse.html">Browse Services</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="providers-join.html">For Providers</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+      </div>
+      <div class="footer-copy">© 2025 Independence NZ · Trusted marketplace for independent living</div>
+    </div>
+  </div>
+</footer>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h3 style="font-size:20px;font-weight:500">Book Pristine Home Services</h3>
+      <button onclick="closeBooking()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3)">×</button>
+    </div>
+    <div id="bookingContent">
+      <div class="form-group">
+        <div class="label" style="margin-bottom:10px">Select a service</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div id="svc1" onclick="selectSvc(1,85,'Standard clean')" style="border:2px solid var(--brand);background:var(--brand-light);border-radius:10px;padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px;font-weight:500;color:var(--brand)">Standard clean</div><div style="font-size:12px;color:var(--text3)">Approx 2–3 hours</div></div>
+            <div style="font-weight:500;color:var(--brand)">$85</div>
+          </div>
+          <div id="svc2" onclick="selectSvc(2,150,'Deep clean')" style="border:1.5px solid var(--border);background:white;border-radius:10px;padding:12px 16px;cursor:pointer;display:flex;justify-content:space-between;align-items:center">
+            <div><div style="font-size:14px;font-weight:500">Deep clean</div><div style="font-size:12px;color:var(--text3)">Approx 4–5 hours</div></div>
+            <div style="font-weight:500">$150</div>
+          </div>
+        </div>
+      </div>
+      <div class="form-group">
+        <div class="label" style="margin-bottom:10px">Choose a time</div>
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+          <div class="slot selected" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Tomorrow</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">1:00 PM</div><div class="slot-date">Tomorrow</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">11:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Fri 18 Jul</div></div>
+          <div class="slot" onclick="selectSlot(this)"><div class="slot-time">2:00 PM</div><div class="slot-date">Fri 18 Jul</div></div>
+        </div>
+      </div>
+      <div style="background:var(--bg);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:var(--text2)"><span id="svcLabel">Standard clean</span><span id="svcPrice">$85.00</span></div>
+        <hr class="divider" style="margin:10px 0">
+        <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500;padding:4px 0"><span>Total</span><span id="totalPrice">$85.00</span></div>
+        <div style="font-size:11px;color:var(--text3);margin-top:8px">💳 Payment processed securely through Independence NZ</div>
+      </div>
+      <a href="auth.html" class="btn btn-primary btn-full btn-lg" id="confirmBtn">Sign in to confirm booking →</a>
+    </div>
+  </div>
+</div>
+
+<script>
+function doSearch() {
+  const q = document.getElementById('heroSearch').value;
+  window.location.href = 'browse.html' + (q ? '?q=' + encodeURIComponent(q) : '');
+}
+document.getElementById('heroSearch').addEventListener('keypress', e => { if(e.key==='Enter') doSearch(); });
+
+function openBooking() { document.getElementById('bookingModal').classList.add('open'); }
+function closeBooking() { document.getElementById('bookingModal').classList.remove('open'); }
+document.getElementById('bookingModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeBooking(); });
+
+let currentPrice = 85;
+function selectSvc(n, price, name) {
+  currentPrice = price;
+  document.getElementById('svcLabel').textContent = name;
+  document.getElementById('svcPrice').textContent = '$' + price + '.00';
+  document.getElementById('totalPrice').textContent = '$' + price + '.00';
+  [1,2].forEach(i => {
+    const el = document.getElementById('svc'+i);
+    if(i===n) { el.style.border='2px solid var(--brand)'; el.style.background='var(--brand-light)'; el.querySelector('div>div').style.color='var(--brand)'; }
+    else { el.style.border='1.5px solid var(--border)'; el.style.background='white'; el.querySelector('div>div').style.color='var(--text)'; }
+  });
+}
+function selectSlot(el) {
+  document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected'));
+  el.classList.add('selected');
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Browse Services — Independence NZ</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    .browse-header { background: white; border-bottom: 1px solid var(--border); padding: 20px 0; }
+    .search-row { display: flex; gap: 12px; align-items: center; margin-bottom: 16px; }
+    .search-box { display: flex; align-items: center; gap: 0; flex: 1; background: var(--bg); border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 0 16px; transition: border-color 0.15s; }
+    .search-box:focus-within { border-color: var(--brand); }
+    .search-box input { flex: 1; border: none; background: transparent; outline: none; padding: 12px 0; font-size: 14px; font-family: 'DM Sans', sans-serif; }
+    .filter-chips { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; }
+    .chip { border: 1.5px solid var(--border); background: white; border-radius: 24px; padding: 7px 16px; font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap; transition: all 0.12s; font-family: 'DM Sans', sans-serif; color: var(--text2); }
+    .chip:hover { border-color: var(--brand); color: var(--brand); }
+    .chip.active { background: var(--brand); color: white; border-color: var(--brand); }
+    .results-bar { display: flex; align-items: center; justify-content: space-between; padding: 16px 0; }
+    .results-count { font-size: 14px; color: var(--text2); }
+    .sort-select { border: 1.5px solid var(--border); border-radius: var(--radius-sm); padding: 8px 14px; font-size: 13px; font-family: 'DM Sans', sans-serif; color: var(--text2); background: white; cursor: pointer; outline: none; }
+    .provider-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    .no-results { text-align: center; padding: 80px 0; }
+    @media (max-width: 900px) { .provider-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 600px) { .provider-grid { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="container">
+    <div class="nav-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="nav-links">
+        <a href="browse.html" style="color:var(--brand);font-weight:500">Browse Services</a>
+        <a href="how-it-works.html">How it works</a>
+        <a href="providers-join.html">For Providers</a>
+      </div>
+      <div class="nav-actions">
+        <a href="auth.html" class="btn btn-secondary btn-sm">Sign in</a>
+        <a href="browse.html" class="btn btn-primary btn-sm">Book a Service</a>
+      </div>
+    </div>
+  </div>
+</nav>
+
+<div class="browse-header">
+  <div class="container">
+    <div class="search-row">
+      <div class="search-box">
+        <span style="color:var(--text3);font-size:16px;margin-right:10px">🔍</span>
+        <input type="text" id="searchInput" placeholder="Search services or providers..." oninput="filterProviders()">
+      </div>
+      <button class="btn btn-secondary btn-sm" style="white-space:nowrap">📍 Auckland</button>
+    </div>
+    <div class="filter-chips">
+      <button class="chip active" onclick="setFilter('all',this)">All services</button>
+      <button class="chip" onclick="setFilter('cleaning',this)">🧹 Home Cleaning</button>
+      <button class="chip" onclick="setFilter('gardening',this)">🌿 Gardening</button>
+      <button class="chip" onclick="setFilter('handyman',this)">🔧 Handyman</button>
+      <button class="chip" onclick="setFilter('fitness',this)">🏃 Fitness & Mobility</button>
+      <button class="chip" onclick="setFilter('care',this)">❤️ Personal Care</button>
+      <button class="chip" onclick="setFilter('transport',this)">🚗 Transport</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="results-bar">
+    <div class="results-count"><strong id="resultCount">8</strong> providers in Auckland</div>
+    <select class="sort-select" onchange="sortProviders(this.value)">
+      <option value="rating">Sort: Top rated</option>
+      <option value="reviews">Most reviewed</option>
+      <option value="price_asc">Price: Low to high</option>
+      <option value="price_desc">Price: High to low</option>
+      <option value="newest">Newest</option>
+    </select>
+  </div>
+
+  <div class="provider-grid" id="providerGrid">
+    <!-- Providers injected by JS -->
+  </div>
+</div>
+
+<br><br>
+
+<footer>
+  <div class="container">
+    <div class="footer-inner">
+      <a href="index.html" class="logo">Independence<span>NZ</span></a>
+      <div class="footer-links">
+        <a href="browse.html">Browse</a>
+        <a href="providers-join.html">For Providers</a>
+        <a href="#">Terms</a>
+        <a href="#">Privacy</a>
+      </div>
+      <div class="footer-copy">© 2025 Independence NZ</div>
+    </div>
+  </div>
+</footer>
+
+<!-- BOOKING MODAL -->
+<div class="modal-overlay" id="bookingModal">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
+      <h3 id="modalTitle" style="font-size:20px;font-weight:500">Book Service</h3>
+      <button onclick="closeBooking()" style="background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3)">×</button>
+    </div>
+    <div class="form-group">
+      <div class="label" style="margin-bottom:10px">Choose a time</div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px">
+        <div class="slot selected" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Tomorrow</div></div>
+        <div class="slot" onclick="selectSlot(this)"><div class="slot-time">1:00 PM</div><div class="slot-date">Tomorrow</div></div>
+        <div class="slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+        <div class="slot" onclick="selectSlot(this)"><div class="slot-time">11:00 AM</div><div class="slot-date">Thu 17 Jul</div></div>
+        <div class="slot" onclick="selectSlot(this)"><div class="slot-time">9:00 AM</div><div class="slot-date">Fri 18 Jul</div></div>
+        <div class="slot" onclick="selectSlot(this)"><div class="slot-time">2:00 PM</div><div class="slot-date">Fri 18 Jul</div></div>
+      </div>
+    </div>
+    <div style="background:var(--bg);border-radius:10px;padding:14px 16px;margin:16px 0">
+      <div style="display:flex;justify-content:space-between;font-size:14px;padding:4px 0;color:var(--text2)"><span id="modalSvc">Service</span><span id="modalPrice">$0</span></div>
+      <hr class="divider" style="margin:10px 0">
+      <div style="display:flex;justify-content:space-between;font-size:14px;font-weight:500"><span>Total</span><span id="modalTotal">$0</span></div>
+      <div style="font-size:11px;color:var(--text3);margin-top:8px">💳 Secure payment through Independence NZ</div>
+    </div>
+    <a href="auth.html" class="btn btn-primary btn-full btn-lg">Sign in to book →</a>
+  </div>
+</div>
+
+<script>
+const providers = [
+  { id:1, name:'Pristine Home Services', cat:'cleaning', catLabel:'Home Cleaning', location:'Auckland Central', rating:4.9, reviews:128, price:85, priceLabel:'$85 / visit', avail:'Available tomorrow', emoji:'🧹', bg:'linear-gradient(135deg,#D1FAE5,#A7F3D0)', topRated:true },
+  { id:2, name:'Sparkle Clean NZ', cat:'cleaning', catLabel:'Home Cleaning', location:'Ponsonby', rating:4.7, reviews:83, price:75, priceLabel:'$75 / visit', avail:'Available Friday', emoji:'🧹', bg:'linear-gradient(135deg,#ECFDF5,#D1FAE5)', topRated:false },
+  { id:3, name:'Green Thumb Gardens', cat:'gardening', catLabel:'Gardening & Outdoors', location:'North Shore', rating:4.8, reviews:94, price:65, priceLabel:'$65 / hour', avail:'Available Friday', emoji:'🌿', bg:'linear-gradient(135deg,#D1FAE5,#FEF3C7)', topRated:false },
+  { id:4, name:'Kiwi Garden Care', cat:'gardening', catLabel:'Gardening & Outdoors', location:'West Auckland', rating:4.6, reviews:51, price:60, priceLabel:'$60 / hour', avail:'Available Monday', emoji:'🌿', bg:'linear-gradient(135deg,#ECFDF5,#FEF9C3)', topRated:false },
+  { id:5, name:'Reliable Handyman Co.', cat:'handyman', catLabel:'Handyman & Maintenance', location:'Manukau', rating:4.7, reviews:61, price:75, priceLabel:'$75 / hour', avail:'Available Monday', emoji:'🔧', bg:'linear-gradient(135deg,#EDE9FE,#DDD6FE)', topRated:false },
+  { id:6, name:'MoveBetter Health', cat:'fitness', catLabel:'Fitness & Mobility', location:'Remuera', rating:5.0, reviews:47, price:90, priceLabel:'$90 / session', avail:'Available today', emoji:'🏃', bg:'linear-gradient(135deg,#FEE2E2,#FECDD3)', topRated:true },
+  { id:7, name:'Care Connect NZ', cat:'care', catLabel:'Personal Care', location:'Takapuna', rating:4.9, reviews:38, price:55, priceLabel:'$55 / hour', avail:'Available tomorrow', emoji:'❤️', bg:'linear-gradient(135deg,#FDF2F8,#FCE7F3)', topRated:false },
+  { id:8, name:'Easy Rides NZ', cat:'transport', catLabel:'Transport & Errands', location:'CBD', rating:4.8, reviews:29, price:45, priceLabel:'$45 / trip', avail:'Available today', emoji:'🚗', bg:'linear-gradient(135deg,#EFF6FF,#DBEAFE)', topRated:false },
+];
+
+let currentFilter = 'all';
+let currentSort = 'rating';
+
+function renderProviders(list) {
+  const grid = document.getElementById('providerGrid');
+  document.getElementById('resultCount').textContent = list.length;
+  if(list.length === 0) {
+    grid.innerHTML = '<div class="no-results" style="grid-column:1/-1"><p style="font-size:40px;margin-bottom:12px">🔍</p><p style="font-weight:500;color:var(--text2);margin-bottom:8px">No providers found</p><p style="font-size:13px;color:var(--text3)">Try a different search or category</p></div>';
+    return;
+  }
+  grid.innerHTML = list.map(p => `
+    <a href="provider.html" class="provider-card">
+      <div class="provider-thumb" style="background:${p.bg}">
+        ${p.emoji}
+        <span style="position:absolute;top:10px;left:10px" class="verified"><span class="verified-dot">✓</span> Verified</span>
+        ${p.topRated ? '<span style="position:absolute;top:10px;right:10px" class="badge badge-amber">⭐ Top Rated</span>' : ''}
+      </div>
+      <div class="provider-body">
+        <div class="provider-name">${p.name}</div>
+        <div class="provider-meta">${p.catLabel} · ${p.location}</div>
+        <div class="provider-rating-row">
+          <span class="stars">${'★'.repeat(Math.round(p.rating))}${'☆'.repeat(5-Math.round(p.rating))}</span>
+          <span style="font-size:13px;font-weight:500">${p.rating.toFixed(1)}</span>
+          <span style="font-size:12px;color:var(--text3)">(${p.reviews} reviews)</span>
+        </div>
+        <div class="provider-price">From <strong>${p.priceLabel}</strong></div>
+        <div class="provider-footer">
+          <span class="avail">${p.avail}</span>
+          <button class="btn btn-primary btn-sm" onclick="event.preventDefault();openBooking('${p.name}','${p.priceLabel}',${p.price})">Book now</button>
+        </div>
+      </div>
+    </a>
+  `).join('');
+}
+
+function filterProviders() {
+  let list = providers.filter(p => currentFilter === 'all' || p.cat === currentFilter);
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  if(q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.catLabel.toLowerCase().includes(q) || p.location.toLowerCase().includes(q));
+  sortList(list);
+  renderProviders(list);
+}
+
+function setFilter(f, el) {
+  currentFilter = f;
+  document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  filterProviders();
+}
+
+function sortProviders(val) {
+  currentSort = val;
+  filterProviders();
+}
+
+function sortList(list) {
+  const sorts = { rating: (a,b)=>b.rating-a.rating, reviews: (a,b)=>b.reviews-a.reviews, price_asc: (a,b)=>a.price-b.price, price_desc: (a,b)=>b.price-a.price };
+  if(sorts[currentSort]) list.sort(sorts[currentSort]);
+}
+
+function openBooking(name, priceLabel, price) {
+  document.getElementById('modalTitle').textContent = 'Book ' + name;
+  document.getElementById('modalSvc').textContent = name;
+  document.getElementById('modalPrice').textContent = '$' + price + '.00';
+  document.getElementById('modalTotal').textContent = '$' + price + '.00';
+  document.getElementById('bookingModal').classList.add('open');
+}
+function closeBooking() { document.getElementById('bookingModal').classList.remove('open'); }
+document.getElementById('bookingModal').addEventListener('click', e => { if(e.target===e.currentTarget) closeBooking(); });
+function selectSlot(el) { document.querySelectorAll('.slot').forEach(s => s.classList.remove('selected')); el.classList.add('selected'); }
+
+// Check URL param
+const params = new URLSearchParams(window.location.search);
+if(params.get('cat')) {
+  const cat = params.get('cat');
+  const chip = [...document.querySelectorAll('.chip')].find(c => c.getAttribute('onclick') && c.getAttribute('onclick').includes("'"+cat+"'"));
+  if(chip) setFilter(cat, chip);
+}
+
+renderProviders(providers);
+</script>
+</body>
+</html>
