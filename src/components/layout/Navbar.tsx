@@ -42,7 +42,7 @@ export default function Navbar() {
     <nav className="bg-white border-b border-gray-100 sticky top-0 z-50">
       <div className="max-w-6xl mx-auto px-4 h-16 flex items-center gap-6">
         <Link href="/" className="font-serif text-xl font-semibold text-brand-500 shrink-0">
-          Independence<span className="text-amber-400">NZ</span>
+          Independence<span className="text-blue-500">NZ</span>
         </Link>
 
         {/* Desktop links */}
