@@ -1,0 +1,24 @@
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Sans:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --brand: #1B6B4A;
+  --brand-light: #E8F5EF;
+  --brand-dark: #0F3D28;
+  --accent: #F59E0B;
+}
+
+@layer components {
+  .btn-primary { @apply bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-xl px-5 py-2.5 transition-all text-sm inline-flex items-center gap-2; }
+  .btn-secondary { @apply border border-gray-200 hover:border-brand-400 bg-white text-gray-700 font-medium rounded-xl px-5 py-2.5 transition-all text-sm inline-flex items-center gap-2; }
+  .btn-white { @apply bg-white text-brand-500 font-semibold rounded-xl px-6 py-3 transition-all text-sm hover:bg-gray-50 inline-flex items-center gap-2; }
+  .card { @apply bg-white rounded-xl border border-gray-100 shadow-sm; }
+  .inp { @apply w-full border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-50 transition-all font-sans; }
+  .lbl { @apply block text-sm font-medium text-gray-600 mb-1.5; }
+  .badge-green { @apply bg-brand-50 text-brand-500 text-xs font-medium px-2.5 py-1 rounded-full; }
+  .badge-amber { @apply bg-amber-100 text-amber-700 text-xs font-medium px-2.5 py-1 rounded-full; }
+  .badge-gray { @apply bg-gray-100 text-gray-500 text-xs font-medium px-2.5 py-1 rounded-full; }
+  .verified { @apply inline-flex items-center gap-1 bg-brand-50 text-brand-500 text-xs font-medium px-2 py-0.5 rounded-full; }
+}
