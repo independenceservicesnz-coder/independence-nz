@@ -7,7 +7,7 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
-  const supabase = createClient()
+ const supabase = await createClient()
 
   useEffect(() => {
     const load = async () => {
