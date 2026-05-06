@@ -48,23 +48,21 @@ export default function BookingModal({
   const [address, setAddress] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [user, setUser] = useState<any>(null)
-  const [profile, setProfile] = useState<any>(null)
   const [userLoading, setUserLoading] = useState(true)
+  const [hasUser, setHasUser] = useState(false)
   const router = useRouter()
   const supabase = createClient()
 
   useEffect(() => {
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      setUser(user)
+      setHasUser(!!user)
       if (user) {
         const { data } = await supabase
           .from('profiles')
-          .select('full_name, email, address, suburb, city')
+          .select('address, suburb, city')
           .eq('id', user.id)
           .single()
-        setProfile(data)
         if (data?.address) {
           setAddress([data.address, data.suburb, data.city].filter(Boolean).join(', '))
         }
@@ -72,9 +70,8 @@ export default function BookingModal({
       setUserLoading(false)
     }
     load()
-
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
-      setUser(session?.user ?? null)
+      setHasUser(!!session?.user)
     })
     return () => subscription.unsubscribe()
   }, [])
@@ -94,84 +91,23 @@ export default function BookingModal({
     setLoading(false)
   }
 
-const handleConfirm = async () => {
-  if (!address.trim()) {
-    setError('Please enter your service address.')
-    return
-  }
-
-  // Get fresh user session directly
-  const { data: { session } } = await supabase.auth.getSession()
-  const currentUser = session?.user
-
-  if (!currentUser) {
-    sessionStorage.setItem('bookingIntent', JSON.stringify({
-      providerName, providerId, serviceName, serviceId,
-      serviceDescription, price, selectedSlot, notes, address,
-    }))
-    closeModal()
-    router.push('/auth/login?redirect=/browse&booking=true')
-    return
-  }
-
-  setLoading(true)
-  setStep('processing')
-  setError('')
-
-  try {
-    const slot = SLOTS[selectedSlot]
-    const scheduledDate = getSlotDate(slot.daysFromNow)
-
-    // Get fresh profile
-    const { data: freshProfile } = await supabase
-      .from('profiles')
-      .select('full_name, email')
-      .eq('id', currentUser.id)
-      .single()
-
-    const response = await fetch('/api/create-checkout-session', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        providerName,
-        providerId: providerId || '',
-        serviceName,
-        serviceId: serviceId || '',
-        serviceDescription: serviceDescription || serviceName,
-        priceCents: price * 100,
-        scheduledDate,
-        scheduledTime: slot.time,
-        address: address.trim(),
-        notes: notes.trim(),
-        customerId: currentUser.id,
-        customerEmail: freshProfile?.email || currentUser.email || '',
-        customerName: freshProfile?.full_name || '',
-      }),
-    })
-
-    const data = await response.json()
-    console.log('Checkout response:', data)
-
-    if (!response.ok) {
-      throw new Error(data.error || 'Something went wrong')
-    }
-
-    if (!data.url) {
-      throw new Error('No payment URL received. Please try again.')
-    }
-
-    window.location.href = data.url
-
-  } catch (err: any) {
-    console.error('Booking error:', err)
-    setError(err.message || 'Something went wrong. Please call 027 325 9707.')
-    setLoading(false)
-    setStep('details')
-  }
-}
-
+  const handleConfirm = async () => {
     if (!address.trim()) {
       setError('Please enter your service address.')
+      return
+    }
+
+    // Get fresh session
+    const { data: { session } } = await supabase.auth.getSession()
+    const currentUser = session?.user
+
+    if (!currentUser) {
+      sessionStorage.setItem('bookingIntent', JSON.stringify({
+        providerName, providerId, serviceName, serviceId,
+        serviceDescription, price, selectedSlot, notes, address,
+      }))
+      closeModal()
+      router.push('/auth/login?redirect=/browse&booking=true')
       return
     }
 
@@ -182,6 +118,12 @@ const handleConfirm = async () => {
     try {
       const slot = SLOTS[selectedSlot]
       const scheduledDate = getSlotDate(slot.daysFromNow)
+
+      const { data: freshProfile } = await supabase
+        .from('profiles')
+        .select('full_name, email')
+        .eq('id', currentUser.id)
+        .single()
 
       const response = await fetch('/api/create-checkout-session', {
         method: 'POST',
@@ -197,29 +139,28 @@ const handleConfirm = async () => {
           scheduledTime: slot.time,
           address: address.trim(),
           notes: notes.trim(),
-          // Pass customer details directly from client
-          customerId: user.id,
-          customerEmail: profile?.email || user.email || '',
-          customerName: profile?.full_name || '',
+          customerId: currentUser.id,
+          customerEmail: freshProfile?.email || currentUser.email || '',
+          customerName: freshProfile?.full_name || '',
         }),
       })
 
       const data = await response.json()
+      console.log('Checkout response:', data)
 
       if (!response.ok) {
         throw new Error(data.error || 'Something went wrong')
       }
 
       if (!data.url) {
-        throw new Error('No payment URL returned. Please try again.')
+        throw new Error('No payment URL received. Please try again.')
       }
 
-      // Redirect to Stripe checkout
       window.location.href = data.url
 
     } catch (err: any) {
       console.error('Booking error:', err)
-      setError(err.message || 'Something went wrong. Please try again or call 027 325 9707.')
+      setError(err.message || 'Something went wrong. Please call 027 325 9707.')
       setLoading(false)
       setStep('details')
     }
@@ -241,7 +182,6 @@ const handleConfirm = async () => {
         >
           <div className="bg-white rounded-t-3xl md:rounded-2xl w-full max-w-lg shadow-2xl max-h-[95vh] overflow-y-auto">
 
-            {/* PROCESSING STATE */}
             {step === 'processing' && (
               <div className="p-12 text-center">
                 <div className="w-14 h-14 border-4 border-brand-100 border-t-brand-500 rounded-full animate-spin mx-auto mb-5"></div>
@@ -254,30 +194,22 @@ const handleConfirm = async () => {
               </div>
             )}
 
-            {/* STEP 1 — SELECT TIME */}
             {step === 'slots' && (
               <>
                 <div className="flex items-center justify-between p-5 border-b border-gray-100">
                   <div>
                     <h3 className="font-serif text-xl font-medium">Book {providerName}</h3>
                     <p className="text-sm text-gray-400 mt-0.5">
-                      {serviceName} ·{' '}
-                      <span className="text-brand-500 font-semibold">${price} NZD</span>
+                      {serviceName} · <span className="text-brand-500 font-semibold">${price} NZD</span>
                     </p>
                   </div>
-                  <button
-                    onClick={closeModal}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-sm transition-colors"
-                  >
+                  <button onClick={closeModal} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-sm transition-colors">
                     ✕
                   </button>
                 </div>
 
                 <div className="p-5">
-                  <p className="text-sm font-medium text-gray-700 mb-3">
-                    Choose a time that suits you
-                  </p>
-
+                  <p className="text-sm font-medium text-gray-700 mb-3">Choose a time that suits you</p>
                   <div className="grid grid-cols-2 gap-2 mb-5">
                     {SLOTS.map((s, i) => (
                       <button
@@ -320,21 +252,16 @@ const handleConfirm = async () => {
                   </button>
 
                   <p className="text-xs text-gray-400 text-center mt-3">
-                    Need help?{' '}
-                    <a href="tel:0273259707" className="text-brand-500">Call 027 325 9707</a>
+                    Need help? <a href="tel:0273259707" className="text-brand-500">Call 027 325 9707</a>
                   </p>
                 </div>
               </>
             )}
 
-            {/* STEP 2 — DETAILS + PAYMENT */}
             {step === 'details' && (
               <>
                 <div className="flex items-center gap-3 p-5 border-b border-gray-100">
-                  <button
-                    onClick={() => setStep('slots')}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-sm transition-colors"
-                  >
+                  <button onClick={() => setStep('slots')} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-sm transition-colors">
                     ←
                   </button>
                   <div className="flex-1">
@@ -343,16 +270,12 @@ const handleConfirm = async () => {
                       {SLOTS[selectedSlot].display} · {SLOTS[selectedSlot].time_label}
                     </p>
                   </div>
-                  <button
-                    onClick={closeModal}
-                    className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-sm transition-colors"
-                  >
+                  <button onClick={closeModal} className="w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 flex items-center justify-center text-gray-500 text-sm transition-colors">
                     ✕
                   </button>
                 </div>
 
                 <div className="p-5 space-y-4">
-                  {/* Price summary */}
                   <div className="bg-gray-50 rounded-xl p-4">
                     <div className="flex items-center justify-between mb-3">
                       <div>
@@ -380,7 +303,6 @@ const handleConfirm = async () => {
                     </div>
                   </div>
 
-                  {/* Address */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Service address <span className="text-red-400">*</span>
@@ -395,7 +317,6 @@ const handleConfirm = async () => {
                     <p className="text-xs text-gray-400 mt-1">Where should the provider come?</p>
                   </div>
 
-                  {/* Notes */}
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1.5">
                       Notes <span className="text-gray-400 font-normal">(optional)</span>
@@ -408,26 +329,21 @@ const handleConfirm = async () => {
                     />
                   </div>
 
-                  {/* Not signed in notice */}
-                  {!userLoading && !user && (
+                  {!userLoading && !hasUser && (
                     <div className="bg-blue-50 border border-blue-100 rounded-xl p-3">
-                      <p className="text-xs text-blue-700 font-medium mb-0.5">
-                        👤 Quick sign in needed
-                      </p>
+                      <p className="text-xs text-blue-700 font-medium mb-0.5">👤 Quick sign in needed</p>
                       <p className="text-xs text-blue-600">
                         We will save your booking details and take you to sign in first, then straight to payment.
                       </p>
                     </div>
                   )}
 
-                  {/* Error */}
                   {error && (
                     <div className="bg-red-50 border border-red-100 text-red-600 text-sm rounded-xl px-4 py-3">
                       {error}
                     </div>
                   )}
 
-                  {/* Confirm button */}
                   <button
                     onClick={handleConfirm}
                     disabled={loading || !address.trim()}
@@ -450,9 +366,7 @@ const handleConfirm = async () => {
                   <div className="text-center pt-1">
                     <p className="text-xs text-gray-400">
                       Prefer to book by phone?{' '}
-                      <a href="tel:0273259707" className="text-brand-500 font-medium">
-                        Call 027 325 9707
-                      </a>
+                      <a href="tel:0273259707" className="text-brand-500 font-medium">Call 027 325 9707</a>
                     </p>
                   </div>
                 </div>
