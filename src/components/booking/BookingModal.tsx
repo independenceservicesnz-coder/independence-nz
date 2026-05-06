@@ -94,17 +94,81 @@ export default function BookingModal({
     setLoading(false)
   }
 
-  const handleConfirm = async () => {
-    // Not signed in — save intent and redirect to login
-    if (!user) {
-      sessionStorage.setItem('bookingIntent', JSON.stringify({
-        providerName, providerId, serviceName, serviceId,
-        serviceDescription, price, selectedSlot, notes, address,
-      }))
-      closeModal()
-      router.push('/auth/login?redirect=/browse&booking=true')
-      return
+const handleConfirm = async () => {
+  if (!address.trim()) {
+    setError('Please enter your service address.')
+    return
+  }
+
+  // Get fresh user session directly
+  const { data: { session } } = await supabase.auth.getSession()
+  const currentUser = session?.user
+
+  if (!currentUser) {
+    sessionStorage.setItem('bookingIntent', JSON.stringify({
+      providerName, providerId, serviceName, serviceId,
+      serviceDescription, price, selectedSlot, notes, address,
+    }))
+    closeModal()
+    router.push('/auth/login?redirect=/browse&booking=true')
+    return
+  }
+
+  setLoading(true)
+  setStep('processing')
+  setError('')
+
+  try {
+    const slot = SLOTS[selectedSlot]
+    const scheduledDate = getSlotDate(slot.daysFromNow)
+
+    // Get fresh profile
+    const { data: freshProfile } = await supabase
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', currentUser.id)
+      .single()
+
+    const response = await fetch('/api/create-checkout-session', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        providerName,
+        providerId: providerId || '',
+        serviceName,
+        serviceId: serviceId || '',
+        serviceDescription: serviceDescription || serviceName,
+        priceCents: price * 100,
+        scheduledDate,
+        scheduledTime: slot.time,
+        address: address.trim(),
+        notes: notes.trim(),
+        customerId: currentUser.id,
+        customerEmail: freshProfile?.email || currentUser.email || '',
+        customerName: freshProfile?.full_name || '',
+      }),
+    })
+
+    const data = await response.json()
+    console.log('Checkout response:', data)
+
+    if (!response.ok) {
+      throw new Error(data.error || 'Something went wrong')
     }
+
+    if (!data.url) {
+      throw new Error('No payment URL received. Please try again.')
+    }
+
+    window.location.href = data.url
+
+  } catch (err: any) {
+    console.error('Booking error:', err)
+    setError(err.message || 'Something went wrong. Please call 027 325 9707.')
+    setLoading(false)
+    setStep('details')
+  }
+}
 
     if (!address.trim()) {
       setError('Please enter your service address.')
