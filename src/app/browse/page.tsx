@@ -77,6 +77,14 @@ export default function BrowsePage() {
 
       {/* Results */}
       <div className="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
+        {/* No fees banner */}
+<div className="bg-brand-50 border border-brand-100 rounded-xl p-4 mb-6 flex items-center gap-3">
+  <span className="text-2xl shrink-0">💚</span>
+  <div>
+    <p className="text-sm font-medium text-brand-700">No platform fees — ever</p>
+    <p className="text-xs text-brand-500">You only pay for the service you book. Independence NZ charges customers nothing extra.</p>
+  </div>
+</div>
         <p className="text-sm text-gray-500 mb-6"><strong className="text-gray-900">{filtered.length}</strong> providers in Auckland</p>
 
         {filtered.length === 0 ? (
