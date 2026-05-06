@@ -11,7 +11,9 @@ export async function middleware(request: NextRequest) {
       cookies: {
         getAll() { return request.cookies.getAll() },
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+          cookiesToSet.forEach(({ name, value }) =>
+            request.cookies.set(name, value)
+          )
           supabaseResponse = NextResponse.next({ request })
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options)
@@ -21,25 +23,8 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session — this is what keeps users logged in
-  const { data: { user } } = await supabase.auth.getUser()
-
-  // If logged in and trying to visit auth pages, redirect to account
-  if (user && request.nextUrl.pathname.startsWith('/auth/login')) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/account'
-    return NextResponse.redirect(url)
-  }
-
-  // If not logged in and trying to visit protected pages, redirect to login
-  const protectedPaths = ['/account']
-  const isProtected = protectedPaths.some(p => request.nextUrl.pathname.startsWith(p))
-  if (isProtected && !user) {
-    const url = request.nextUrl.clone()
-    url.pathname = '/auth/login'
-    url.searchParams.set('redirect', request.nextUrl.pathname)
-    return NextResponse.redirect(url)
-  }
+  // Refresh the session on every request — keeps user logged in
+  await supabase.auth.getUser()
 
   return supabaseResponse
 }
