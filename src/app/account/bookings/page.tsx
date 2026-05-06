@@ -1,156 +1,110 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import ReviewButton from '@/components/account/ReviewButton'
+import Navbar from '@/components/layout/Navbar'
 
-export default async function BookingsPage() {
+export default async function BookingSuccessPage({
+  searchParams,
+}: {
+  searchParams: { session_id?: string }
+}) {
   const supabase = await createClient()
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
+  const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: raw } = await supabase
+  const { data: booking } = await supabase
     .from('bookings')
-    .select(
-      '*, providers(id, business_name), services(name, duration_minutes), reviews(id, rating)'
-    )
+    .select('*, providers(business_name), services(name)')
     .eq('customer_id', user!.id)
-    .order('scheduled_date', { ascending: false })
-
-  const bookings: any[] = raw || []
-  const upcoming = bookings.filter((b: any) =>
-    ['pending', 'confirmed', 'in_progress'].includes(b.status)
-  )
-  const past = bookings.filter((b: any) =>
-    ['completed', 'cancelled'].includes(b.status)
-  )
-
-  const statusClass: Record<string, string> = {
-    pending: 'badge-amber',
-    confirmed: 'badge-green',
-    in_progress:
-      'text-xs font-medium px-2.5 py-1 rounded-full bg-blue-50 text-blue-600',
-    completed: 'badge-gray',
-    cancelled:
-      'text-xs font-medium px-2.5 py-1 rounded-full bg-red-50 text-red-500',
-  }
-
-  const BookingCard = ({ b }: { b: any }) => {
-    const hasReview = (b.reviews?.length || 0) > 0
-    const canReview = b.status === 'completed' && !hasReview
-    return (
-      <div className="card p-5">
-        <div className="flex items-start justify-between gap-3 mb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-11 h-11 rounded-xl bg-brand-50 flex items-center justify-center text-xl shrink-0">
-              🏠
-            </div>
-            <div>
-              <p className="font-medium text-sm">{b.services?.name}</p>
-              <p className="text-xs text-gray-400">
-                {b.providers?.business_name}
-              </p>
-            </div>
-          </div>
-          <span className={statusClass[b.status] || 'badge-gray'}>
-            {b.status.charAt(0).toUpperCase() + b.status.slice(1)}
-          </span>
-        </div>
-        <div className="grid grid-cols-3 gap-3 bg-gray-50 rounded-xl p-3 mb-4 text-xs">
-          <div>
-            <p className="text-gray-400 mb-0.5">Date</p>
-            <p className="font-medium">
-              {new Date(b.scheduled_date).toLocaleDateString('en-NZ', {
-                day: 'numeric',
-                month: 'short',
-                year: 'numeric',
-              })}
-            </p>
-          </div>
-          <div>
-            <p className="text-gray-400 mb-0.5">Time</p>
-            <p className="font-medium">{b.scheduled_time?.slice(0, 5)}</p>
-          </div>
-          <div>
-            <p className="text-gray-400 mb-0.5">Paid</p>
-            <p className="font-medium">
-              ${(b.amount_cents / 100).toFixed(2)}
-            </p>
-          </div>
-        </div>
-        <div className="flex items-center gap-3 pt-3 border-t border-gray-50">
-          {canReview && (
-            <ReviewButton bookingId={b.id} providerId={b.provider_id} />
-          )}
-          {hasReview && (
-            <span className="text-xs text-amber-500 font-medium">
-              {'★'.repeat(b.reviews[0].rating)} Reviewed
-            </span>
-          )}
-          <Link
-            href="/browse"
-            className="text-xs text-brand-500 font-medium ml-auto"
-          >
-            Rebook →
-          </Link>
-        </div>
-      </div>
-    )
-  }
+    .in('status', ['confirmed', 'pending'])
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single()
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-baseline justify-between">
-        <div>
-          <h1 className="font-serif text-2xl font-medium">My Bookings</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            View and manage all your service bookings.
-          </p>
+    <div className="min-h-screen bg-[#F7F9F7] flex flex-col">
+      <Navbar />
+      <div className="flex-1 flex items-center justify-center px-4 py-16">
+        <div className="w-full max-w-md">
+          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
+            <div className="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6">
+              <span className="text-4xl">✅</span>
+            </div>
+            <h1 className="font-serif text-3xl font-medium text-brand-500 mb-2">
+              Booking confirmed!
+            </h1>
+            <p className="text-gray-500 mb-6 leading-relaxed">
+              Your booking is confirmed. Your card has been authorised but you will not be charged until the service is completed.
+            </p>
+
+            {booking && (
+              <div className="bg-gray-50 rounded-xl p-4 mb-5 text-left space-y-3">
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Service</span>
+                  <span className="font-medium">{(booking.services as any)?.name || 'Service'}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Provider</span>
+                  <span className="font-medium">{(booking.providers as any)?.business_name || 'Provider'}</span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Date</span>
+                  <span className="font-medium">
+                    {new Date(booking.scheduled_date).toLocaleDateString('en-NZ', {
+                      weekday: 'long',
+                      day: 'numeric',
+                      month: 'long',
+                    })}
+                  </span>
+                </div>
+                <div className="flex justify-between text-sm">
+                  <span className="text-gray-400">Time</span>
+                  <span className="font-medium">{booking.scheduled_time?.slice(0, 5)}</span>
+                </div>
+                <div className="flex justify-between text-sm border-t border-gray-200 pt-3">
+                  <span className="text-gray-400">Amount</span>
+                  <span className="font-semibold text-brand-500">
+                    ${(booking.amount_cents / 100).toFixed(2)} NZD
+                  </span>
+                </div>
+              </div>
+            )}
+
+            {/* Payment hold explanation */}
+            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-5 text-left">
+              <p className="text-sm font-semibold text-amber-700 mb-1">🔒 Your payment is held safely</p>
+              <p className="text-xs text-amber-600 leading-relaxed">
+                Your card has been authorised but not charged yet. Payment is only released once your service is completed and you are happy. This protects you as a customer.
+              </p>
+            </div>
+
+            <div className="bg-brand-50 rounded-xl p-4 mb-6 text-left">
+              <p className="text-xs text-brand-600 leading-relaxed">
+                <strong>What happens next:</strong><br/>
+                1. Your provider will arrive at the scheduled time<br/>
+                2. Once the service is complete, payment is released<br/>
+                3. You will be asked to leave a star rating and review
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-3">
+              <Link href="/account/bookings" className="btn-primary justify-center py-3">
+                View my bookings
+              </Link>
+              <Link href="/browse" className="btn-secondary justify-center py-3">
+                Book another service
+              </Link>
+            </div>
+          </div>
+
+          <div className="text-center mt-6">
+            <p className="text-sm text-gray-400">
+              Need help?{' '}
+              <a href="tel:0273259707" className="text-brand-500 font-medium">
+                Call 027 325 9707
+              </a>
+            </p>
+          </div>
         </div>
-        <Link href="/browse" className="btn-primary text-xs px-4 py-2">
-          + Book a service
-        </Link>
       </div>
-
-      {upcoming.length > 0 && (
-        <section>
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-brand-400 inline-block"></span>
-            Upcoming
-          </h2>
-          <div className="space-y-3">
-            {upcoming.map((b: any) => (
-              <BookingCard key={b.id} b={b} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {past.length > 0 && (
-        <section>
-          <h2 className="text-xs font-medium text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-gray-300 inline-block"></span>
-            Past bookings
-          </h2>
-          <div className="space-y-3">
-            {past.map((b: any) => (
-              <BookingCard key={b.id} b={b} />
-            ))}
-          </div>
-        </section>
-      )}
-
-      {bookings.length === 0 && (
-        <div className="card p-16 text-center">
-          <p className="text-4xl mb-4">📋</p>
-          <p className="font-medium mb-2">No bookings yet</p>
-          <p className="text-sm text-gray-400 mb-5">
-            Browse trusted local providers and make your first booking.
-          </p>
-          <Link href="/browse" className="btn-primary">
-            Browse services
-          </Link>
-        </div>
-      )}
     </div>
   )
 }
