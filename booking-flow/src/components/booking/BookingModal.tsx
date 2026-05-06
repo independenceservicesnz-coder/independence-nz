@@ -191,20 +191,33 @@ export default function BookingModal({
               />
             </div>
 
-            {/* Price summary */}
-            <div className="bg-gray-50 rounded-xl p-4 mb-5">
-              <div className="flex justify-between text-sm text-gray-600 mb-2">
-                <span>{serviceName}</span>
-                <span>${price}.00</span>
-              </div>
-              <div className="flex justify-between text-sm font-semibold border-t border-gray-200 pt-2 mt-2">
-                <span>Total</span>
-                <span className="text-brand-500">${price}.00 NZD</span>
-              </div>
-              <p className="text-xs text-gray-400 mt-2 flex items-center gap-1">
-                🔒 Secure payment through Independence NZ
-              </p>
-            </div>
+{/* Price summary */}
+<div className="bg-gray-50 rounded-xl p-4 mb-5">
+  <div className="flex justify-between text-sm text-gray-600 mb-2">
+    <span>{serviceName}</span>
+    <span>${price}.00</span>
+  </div>
+  <div className="flex justify-between text-sm text-gray-400 mb-2">
+    <span>Platform fee</span>
+    <span className="text-brand-500 font-medium">FREE</span>
+  </div>
+  <div className="flex justify-between text-sm text-gray-400 mb-2">
+    <span>Membership fee</span>
+    <span className="text-brand-500 font-medium">FREE</span>
+  </div>
+  <div className="flex justify-between text-sm font-semibold border-t border-gray-200 pt-2 mt-2">
+    <span>Total</span>
+    <span className="text-brand-500">${price}.00 NZD</span>
+  </div>
+  <div className="bg-brand-50 rounded-lg p-2.5 mt-3">
+    <p className="text-xs text-brand-600 font-medium text-center">
+      💚 You only pay for the service. No extra fees — ever.
+    </p>
+  </div>
+  <p className="text-xs text-gray-400 mt-2 flex items-center gap-1 justify-center">
+    🔒 Payment held securely until service is complete
+  </p>
+</div>
 
             {/* Error */}
             {error && (
