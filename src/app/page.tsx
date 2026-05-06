@@ -34,10 +34,10 @@ const howItWorks = [
 ]
 
 const trust = [
-  { icon: '🔒', label: 'Secure payments', sub: 'All payments processed through Independence NZ' },
+  { icon: '💚', label: 'No extra fees ever', sub: 'You only pay for the service you book — nothing more' },
+  { icon: '🔒', label: 'Secure payments', sub: 'Payment held safely until your service is complete' },
   { icon: '✅', label: 'Vetted providers', sub: 'Every provider is background checked and verified' },
   { icon: '⭐', label: 'Verified reviews', sub: 'Reviews only from customers with real bookings' },
-  { icon: '📞', label: 'NZ-based support', sub: 'Local team here to help whenever you need' },
 ]
 
 export default function HomePage() {
