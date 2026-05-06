@@ -3,24 +3,23 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
-  console.log('=== Checkout session started ===')
-  console.log('SUPABASE_URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
-  console.log('SERVICE_ROLE exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
-  console.log('STRIPE_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
-  console.log('APP_URL:', process.env.NEXT_PUBLIC_APP_URL)
-
   try {
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
+    // Log which env vars exist (check in Vercel function logs)
+    console.log('SUPABASE_URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+    console.log('SERVICE_ROLE exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+    console.log('STRIPE_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
+    console.log('APP_URL:', process.env.NEXT_PUBLIC_APP_URL)
 
-export async function POST(request: NextRequest) {
-  try {
-    // Validate Stripe key exists
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(
-        { error: 'Payment system not configured. Please call 027 325 9707 to book.' },
+        { error: 'Payment system not configured. Please call 027 325 9707.' },
+        { status: 500 }
+      )
+    }
+
+    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      return NextResponse.json(
+        { error: 'Database not configured. Please call 027 325 9707.' },
         { status: 500 }
       )
     }
@@ -29,14 +28,17 @@ export async function POST(request: NextRequest) {
       apiVersion: '2024-06-20',
     })
 
-    // Parse request body
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
+
     const body = await request.json()
     const {
       providerName,
       providerId,
       serviceName,
       serviceId,
-      serviceDescription,
       priceCents,
       scheduledDate,
       scheduledTime,
@@ -47,7 +49,8 @@ export async function POST(request: NextRequest) {
       customerName,
     } = body
 
-    // Validate required fields
+    console.log('Booking request received:', { providerName, serviceName, priceCents, customerId })
+
     if (!priceCents || !scheduledDate || !scheduledTime || !providerName || !serviceName) {
       return NextResponse.json(
         { error: 'Missing required booking details.' },
@@ -62,8 +65,8 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 1: Save booking to Supabase as PENDING
-    // This happens BEFORE Stripe so we always have a record
+    // Save booking to Supabase as pending FIRST
+    console.log('Saving booking to Supabase...')
     const { data: booking, error: bookingError } = await supabaseAdmin
       .from('bookings')
       .insert({
@@ -89,9 +92,12 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    // Step 2: Create Stripe checkout session
+    console.log('Booking saved with ID:', booking.id)
+
+    // Create Stripe checkout session
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://independencenz.com'
 
+    console.log('Creating Stripe session...')
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: customerEmail || undefined,
@@ -115,7 +121,6 @@ export async function POST(request: NextRequest) {
       ],
       mode: 'payment',
       payment_intent_data: {
-        // ESCROW: Authorise card but don't capture until service complete
         capture_method: 'manual',
         description: `Independence NZ · ${serviceName} · ${providerName}`,
         metadata: {
@@ -148,7 +153,9 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Step 3: Update booking with Stripe session ID
+    console.log('Stripe session created:', session.id, 'URL:', session.url)
+
+    // Update booking with Stripe payment intent ID
     await supabaseAdmin
       .from('bookings')
       .update({
@@ -157,19 +164,17 @@ export async function POST(request: NextRequest) {
       })
       .eq('id', booking.id)
 
-    // Step 4: Return Stripe checkout URL to frontend
     return NextResponse.json({
       url: session.url,
       bookingId: booking.id,
     })
 
   } catch (error: any) {
-    console.error('Checkout error:', error)
+    console.error('Checkout session error:', error)
 
-    // Give helpful error messages
     if (error.type === 'StripeAuthenticationError') {
       return NextResponse.json(
-        { error: 'Payment system error. Please call 027 325 9707 to book.' },
+        { error: 'Payment system error. Please call 027 325 9707.' },
         { status: 500 }
       )
     }
