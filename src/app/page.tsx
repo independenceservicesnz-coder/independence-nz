@@ -207,8 +207,8 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto px-4 py-16 w-full">
         <div className="rounded-2xl overflow-hidden h-72 md:h-96 relative">
           <img
-  src="https://images.unsplash.com/photo-1575783970733-1aaedde1db74?w=1200&q=80"
-            alt="Happy elderly couple smiling together"
+  src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=1200&q=80"
+alt="Happy elderly man smiling"
             className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-700/70 to-transparent flex items-center">
