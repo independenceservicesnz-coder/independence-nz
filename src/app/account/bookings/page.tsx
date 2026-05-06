@@ -1,109 +1,224 @@
 import { createClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import Navbar from '@/components/layout/Navbar'
+import ReviewButton from '@/components/account/ReviewButton'
 
-export default async function BookingSuccessPage({
-  searchParams,
-}: {
-  searchParams: { session_id?: string }
-}) {
+export default async function BookingsPage() {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
 
-  const { data: booking } = await supabase
+  const { data: raw } = await supabase
     .from('bookings')
-    .select('*, providers(business_name), services(name)')
+    .select('*, providers(id, business_name, suburb, city), services(name, duration_minutes), reviews(id, rating)')
     .eq('customer_id', user!.id)
-    .in('status', ['confirmed', 'pending'])
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .single()
+    .order('scheduled_date', { ascending: false })
 
-  return (
-    <div className="min-h-screen bg-[#F7F9F7] flex flex-col">
-      <Navbar />
-      <div className="flex-1 flex items-center justify-center px-4 py-16">
-        <div className="w-full max-w-md">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-8 text-center">
-            <div className="w-20 h-20 bg-brand-50 rounded-full flex items-center justify-center mx-auto mb-6">
-              <span className="text-4xl">✅</span>
+  const bookings: any[] = raw || []
+  const upcoming = bookings.filter((b: any) =>
+    ['pending', 'confirmed', 'in_progress'].includes(b.status)
+  )
+  const past = bookings.filter((b: any) =>
+    ['completed', 'cancelled'].includes(b.status)
+  )
+
+  const statusConfig: Record<string, { label: string; class: string; icon: string }> = {
+    pending: { label: 'Payment pending', class: 'bg-amber-100 text-amber-700', icon: '⏳' },
+    confirmed: { label: 'Confirmed', class: 'bg-brand-50 text-brand-500', icon: '✅' },
+    in_progress: { label: 'In progress', class: 'bg-blue-50 text-blue-600', icon: '🔄' },
+    completed: { label: 'Completed', class: 'bg-gray-100 text-gray-500', icon: '✓' },
+    cancelled: { label: 'Cancelled', class: 'bg-red-50 text-red-500', icon: '✕' },
+  }
+
+  const paymentConfig: Record<string, { label: string; class: string }> = {
+    pending: { label: 'Payment pending', class: 'text-amber-600' },
+    held: { label: 'Payment held securely', class: 'text-brand-500' },
+    paid: { label: 'Payment released', class: 'text-gray-400' },
+    failed: { label: 'Payment failed', class: 'text-red-500' },
+    refunded: { label: 'Refunded', class: 'text-gray-400' },
+  }
+
+  const BookingCard = ({ b }: { b: any }) => {
+    const hasReview = (b.reviews?.length || 0) > 0
+    const canReview = b.status === 'completed' && !hasReview
+    const status = statusConfig[b.status] || { label: b.status, class: 'bg-gray-100 text-gray-500', icon: '•' }
+    const payment = paymentConfig[b.payment_status] || { label: b.payment_status, class: 'text-gray-400' }
+
+    return (
+      <div className="bg-white rounded-xl border border-gray-100 overflow-hidden hover:shadow-sm transition-all">
+        {/* Card header */}
+        <div className="flex items-center justify-between px-5 py-3 bg-gray-50 border-b border-gray-100">
+          <div className="flex items-center gap-2">
+            <span>{status.icon}</span>
+            <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${status.class}`}>
+              {status.label}
+            </span>
+          </div>
+          <span className="text-xs text-gray-400">
+            Booked {new Date(b.created_at).toLocaleDateString('en-NZ', { day: 'numeric', month: 'short' })}
+          </span>
+        </div>
+
+        <div className="p-5">
+          {/* Service and provider */}
+          <div className="flex items-start justify-between gap-3 mb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl bg-brand-50 flex items-center justify-center text-2xl shrink-0">
+                🏠
+              </div>
+              <div>
+                <p className="font-medium text-gray-900">{b.services?.name || 'Service'}</p>
+                <p className="text-sm text-gray-400">{b.providers?.business_name || 'Provider'}</p>
+                {b.providers?.suburb && (
+                  <p className="text-xs text-gray-400">{b.providers.suburb}, {b.providers.city}</p>
+                )}
+              </div>
             </div>
-            <h1 className="font-serif text-3xl font-medium text-brand-500 mb-2">
-              Booking confirmed!
-            </h1>
-            <p className="text-gray-500 mb-6 leading-relaxed">
-              Your booking is confirmed. Your card has been authorised but you will not be charged until the service is completed.
-            </p>
+            <div className="text-right shrink-0">
+              <p className="font-bold text-brand-500 text-lg">
+                ${(b.amount_cents / 100).toFixed(2)}
+              </p>
+              <p className="text-xs text-gray-400">NZD</p>
+            </div>
+          </div>
 
-            {booking && (
-              <div className="bg-gray-50 rounded-xl p-4 mb-5 text-left space-y-3">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Service</span>
-                  <span className="font-medium">{(booking.services as any)?.name || 'Service'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Provider</span>
-                  <span className="font-medium">{(booking.providers as any)?.business_name || 'Provider'}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Date</span>
-                  <span className="font-medium">
-                    {new Date(booking.scheduled_date).toLocaleDateString('en-NZ', {
-                      weekday: 'long',
-                      day: 'numeric',
-                      month: 'long',
-                    })}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-400">Time</span>
-                  <span className="font-medium">{booking.scheduled_time?.slice(0, 5)}</span>
-                </div>
-                <div className="flex justify-between text-sm border-t border-gray-200 pt-3">
-                  <span className="text-gray-400">Amount</span>
-                  <span className="font-semibold text-brand-500">
-                    ${(booking.amount_cents / 100).toFixed(2)} NZD
-                  </span>
-                </div>
+          {/* Date, time, address */}
+          <div className="grid grid-cols-2 gap-3 bg-gray-50 rounded-xl p-3 mb-4 text-xs">
+            <div>
+              <p className="text-gray-400 mb-0.5">Date</p>
+              <p className="font-medium text-gray-700">
+                {new Date(b.scheduled_date).toLocaleDateString('en-NZ', {
+                  weekday: 'short',
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric',
+                })}
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-400 mb-0.5">Time</p>
+              <p className="font-medium text-gray-700">{b.scheduled_time?.slice(0, 5) || '—'}</p>
+            </div>
+            {b.address && (
+              <div className="col-span-2">
+                <p className="text-gray-400 mb-0.5">Address</p>
+                <p className="font-medium text-gray-700">{b.address}</p>
               </div>
             )}
+            {b.notes && (
+              <div className="col-span-2">
+                <p className="text-gray-400 mb-0.5">Notes</p>
+                <p className="font-medium text-gray-700">{b.notes}</p>
+              </div>
+            )}
+          </div>
 
-            {/* Payment hold explanation */}
-            <div className="bg-amber-50 border border-amber-100 rounded-xl p-4 mb-5 text-left">
-              <p className="text-sm font-semibold text-amber-700 mb-1">🔒 Your payment is held safely</p>
-              <p className="text-xs text-amber-600 leading-relaxed">
-                Your card has been authorised but not charged yet. Payment is only released once your service is completed and you are happy. This protects you as a customer.
-              </p>
-            </div>
-
-            <div className="bg-brand-50 rounded-xl p-4 mb-6 text-left">
-              <p className="text-xs text-brand-600 leading-relaxed">
-                <strong>What happens next:</strong><br/>
-                1. Your provider will arrive at the scheduled time<br/>
-                2. Once the service is complete, payment is released<br/>
-                3. You will be asked to leave a star rating and review
-              </p>
-            </div>
-
-            <div className="flex flex-col gap-3">
-              <Link href="/account/bookings" className="btn-primary justify-center py-3">
-                View my bookings
-              </Link>
-              <Link href="/browse" className="btn-secondary justify-center py-3">
-                Book another service
-              </Link>
+          {/* Payment status */}
+          <div className="flex items-center gap-2 mb-4 px-3 py-2.5 bg-gray-50 rounded-xl">
+            <span className="text-base">
+              {b.payment_status === 'held' ? '🔒' : b.payment_status === 'paid' ? '✅' : b.payment_status === 'failed' ? '❌' : '⏳'}
+            </span>
+            <div>
+              <p className={`text-xs font-medium ${payment.class}`}>{payment.label}</p>
+              {b.payment_status === 'held' && (
+                <p className="text-xs text-gray-400">Your card is authorised. Payment releases when service is complete.</p>
+              )}
+              {b.payment_status === 'paid' && (
+                <p className="text-xs text-gray-400">Payment processed successfully.</p>
+              )}
+              {b.payment_status === 'pending' && (
+                <p className="text-xs text-gray-400">Awaiting payment confirmation.</p>
+              )}
             </div>
           </div>
 
-          <div className="text-center mt-6">
-            <p className="text-sm text-gray-400">
-              Need help?{' '}
-              <a href="tel:0273259707" className="text-brand-500 font-medium">
-                Call 027 325 9707
-              </a>
-            </p>
+          {/* Actions */}
+          <div className="flex items-center gap-3 pt-3 border-t border-gray-50">
+            {canReview && (
+              <ReviewButton bookingId={b.id} providerId={b.provider_id} />
+            )}
+            {hasReview && (
+              <div className="flex items-center gap-1 text-xs text-amber-500 font-medium">
+                {'★'.repeat(b.reviews[0].rating)}
+                <span className="text-gray-400 font-normal ml-1">Review submitted</span>
+              </div>
+            )}
+            {b.status === 'confirmed' && (
+              <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                <span className="w-1.5 h-1.5 rounded-full bg-brand-400 inline-block"></span>
+                Provider will contact you
+              </div>
+            )}
+            <Link
+              href="/browse"
+              className="text-xs text-brand-500 font-medium ml-auto hover:underline"
+            >
+              Book again →
+            </Link>
           </div>
         </div>
+      </div>
+    )
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="flex items-baseline justify-between">
+        <div>
+          <h1 className="font-serif text-2xl font-medium">My Bookings</h1>
+          <p className="text-gray-400 text-sm mt-1">View and manage all your service bookings.</p>
+        </div>
+        <Link href="/browse" className="btn-primary text-xs px-4 py-2">
+          + Book a service
+        </Link>
+      </div>
+
+      {/* Upcoming */}
+      {upcoming.length > 0 && (
+        <section>
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-brand-400 inline-block"></span>
+            Upcoming bookings
+          </h2>
+          <div className="space-y-4">
+            {upcoming.map((b: any) => <BookingCard key={b.id} b={b} />)}
+          </div>
+        </section>
+      )}
+
+      {/* Past */}
+      {past.length > 0 && (
+        <section>
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-gray-300 inline-block"></span>
+            Past bookings
+          </h2>
+          <div className="space-y-4">
+            {past.map((b: any) => <BookingCard key={b.id} b={b} />)}
+          </div>
+        </section>
+      )}
+
+      {/* Empty state */}
+      {bookings.length === 0 && (
+        <div className="bg-white rounded-xl border border-gray-100 p-16 text-center">
+          <p className="text-5xl mb-4">📋</p>
+          <p className="font-serif text-xl font-medium mb-2">No bookings yet</p>
+          <p className="text-sm text-gray-400 mb-6 max-w-xs mx-auto">
+            Browse trusted local providers and make your first booking. You only pay for the service — no extra fees.
+          </p>
+          <Link href="/browse" className="btn-primary">
+            Browse services →
+          </Link>
+        </div>
+      )}
+
+      {/* Help section */}
+      <div className="bg-white rounded-xl border border-gray-100 p-5 text-center">
+        <p className="text-sm font-medium text-gray-700 mb-1">Need help with a booking?</p>
+        <p className="text-xs text-gray-400 mb-3">Our NZ-based team is here Mon–Fri 8am–6pm · Sat 9am–3pm</p>
+        <a href="tel:0273259707"
+          className="inline-flex items-center gap-2 bg-brand-50 hover:bg-brand-100 text-brand-500 font-semibold px-5 py-2.5 rounded-xl transition-colors text-sm">
+          📞 Call 027 325 9707
+        </a>
       </div>
     </div>
   )
