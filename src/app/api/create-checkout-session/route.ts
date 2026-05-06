@@ -2,11 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-// Use service role so booking insert bypasses RLS
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+export async function POST(request: NextRequest) {
+  console.log('=== Checkout session started ===')
+  console.log('SUPABASE_URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
+  console.log('SERVICE_ROLE exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
+  console.log('STRIPE_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
+  console.log('APP_URL:', process.env.NEXT_PUBLIC_APP_URL)
+
+  try {
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    )
 
 export async function POST(request: NextRequest) {
   try {
