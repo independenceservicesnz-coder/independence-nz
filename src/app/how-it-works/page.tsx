@@ -17,7 +17,7 @@ export default function HowItWorksPage() {
           { n: '1', icon: '🔍', title: 'Browse services', body: 'Search by category or type what you need. Filter by location, rating, or price. Every provider on the platform has been vetted and verified.' },
           { n: '2', icon: '⭐', title: 'Compare providers', body: 'Read verified star ratings and reviews from real customers. Check pricing, availability, and provider profiles before making a decision.' },
           { n: '3', icon: '📅', title: 'Book a time', body: 'Choose a date and time that suits you. Select your specific service and add any notes for the provider.' },
-          { n: '4', icon: '💳', title: 'Pay securely', body: 'All payments are processed securely through Independence NZ. You never pay the provider directly — we handle everything.' },
+          { n: '4', icon: '💳', title: 'Book & pay — no extra fees', body: 'You only pay for the service itself. Independence NZ charges customers no platform fees, no membership fees, and no hidden costs. Ever.' },
           { n: '5', icon: '🏠', title: 'Receive your service', body: 'Your verified provider arrives at the scheduled time. If anything is ever wrong, our NZ-based support team is here to help.' },
           { n: '6', icon: '★', title: 'Rate your experience', body: 'After every completed booking, leave a star rating and written review. Your feedback helps others choose the best providers.' },
         ].map(s => (
