@@ -12,7 +12,10 @@ export async function POST(request: NextRequest) {
     const { data: { user } } = await supabase.auth.getUser()
 
     if (!user) {
-      return NextResponse.json({ error: 'You must be signed in to book a service.' }, { status: 401 })
+      return NextResponse.json(
+        { error: 'You must be signed in to book a service.' },
+        { status: 401 }
+      )
     }
 
     const body = await request.json()
@@ -27,14 +30,14 @@ export async function POST(request: NextRequest) {
       serviceId,
     } = body
 
-    // Get customer profile
     const { data: profile } = await supabase
       .from('profiles')
       .select('full_name, email')
       .eq('id', user.id)
       .single()
 
-    // Create Stripe checkout session
+    // Create Stripe checkout session with manual capture
+    // This HOLDS the payment but does NOT charge until you release it
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: profile?.email || user.email,
@@ -52,6 +55,20 @@ export async function POST(request: NextRequest) {
         },
       ],
       mode: 'payment',
+      payment_intent_data: {
+        // This is the key line — holds payment, does not capture
+        capture_method: 'manual',
+        metadata: {
+          customerId: user.id,
+          providerId: providerId || '',
+          serviceId: serviceId || '',
+          providerName,
+          serviceName,
+          scheduledDate,
+          scheduledTime,
+          priceCents: priceCents.toString(),
+        },
+      },
       success_url: `${process.env.NEXT_PUBLIC_APP_URL}/booking/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/browse`,
       metadata: {
@@ -66,17 +83,18 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // Create pending booking in Supabase
+    // Save booking as payment_held — not yet paid
     await supabase.from('bookings').insert({
       customer_id: user.id,
       provider_id: providerId || null,
       service_id: serviceId || null,
-      status: 'pending',
+      status: 'confirmed',
       scheduled_date: scheduledDate,
       scheduled_time: scheduledTime,
       amount_cents: priceCents,
-      payment_status: 'pending',
+      payment_status: 'held',
       stripe_payment_intent_id: session.payment_intent as string,
+      notes: `Payment held. Will be released when service is completed.`,
     })
 
     return NextResponse.json({ url: session.url })
