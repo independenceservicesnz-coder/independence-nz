@@ -346,7 +346,7 @@ export default function BookingModal({
 
                   <button
                     onClick={handleConfirm}
-                    disabled={loading || !address.trim()}
+                    disabled={loading}
                     className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors text-base flex items-center justify-center gap-2"
                   >
                     {loading ? (
