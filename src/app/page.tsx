@@ -213,7 +213,7 @@ alt="Happy elderly person smiling at home"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-brand-700/70 to-transparent flex items-center">
             <div className="px-10 text-white max-w-md">
-              <h2 className="font-serif text-3xl font-medium mb-3">Still dancing.<br />Still independent.</h2>
+              <h2 className="font-serif text-3xl font-medium mb-3">Still smiling.<br />Still independent.</h2>
               <p className="text-white/80 text-sm leading-relaxed mb-5">Trusted by over 2,400 New Zealand families to find reliable home services.</p>
               <Link href="/browse" className="bg-white text-brand-500 font-semibold px-6 py-2.5 rounded-xl hover:bg-gray-50 transition-colors text-sm inline-block">
                 Browse services →
