@@ -6,7 +6,7 @@ import Link from 'next/link'
 
 const benefits = [
   { icon: '📈', title: 'Consistent bookings', desc: 'Access a steady stream of recurring local customers who need your services' },
-  { icon: '💳', title: 'Zero commission', desc: 'Keep 100% of every service payment. We earn from subscriptions, not your work' },
+  { icon: '💳', title: 'Zero commission on earnings', desc: 'Keep 100% of every service payment. Customers pay no platform fees either — making Independence NZ more attractive to book through' },
   { icon: '⭐', title: 'Build your reputation', desc: 'Verified star ratings and reviews attract more customers automatically' },
   { icon: '💰', title: 'Payments handled', desc: 'Customers pay through Independence NZ. You receive payment promptly' },
   { icon: '🏆', title: 'Premium visibility', desc: 'Your profile appears across our trusted marketplace reaching families who need you' },
@@ -84,7 +84,18 @@ export default function ProvidersPage() {
           ))}
         </div>
       </section>
-
+{/* Two sided model explanation */}
+<section className="max-w-3xl mx-auto px-4 pb-8 w-full">
+  <div className="bg-brand-50 border border-brand-100 rounded-2xl p-6 text-center">
+    <p className="text-2xl mb-3">💚</p>
+    <h3 className="font-serif text-xl font-medium text-brand-700 mb-2">
+      A model that works for everyone
+    </h3>
+    <p className="text-sm text-brand-600 leading-relaxed max-w-lg mx-auto">
+      Customers pay zero platform fees — they only pay for the service they book. Providers pay a flat monthly subscription. This means more customers choose Independence NZ because there are no hidden costs, which means more bookings for you.
+    </p>
+  </div>
+</section>
       {/* Pricing */}
       <section className="bg-white border-t border-b border-gray-100 py-16">
         <div className="max-w-md mx-auto px-4">
