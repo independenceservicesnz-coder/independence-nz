@@ -194,7 +194,13 @@ export default function AuthForm() {
                 </button>
               </div>
             )}
-
+{mode === 'signup' && (
+  <div className="bg-brand-50 border border-brand-100 rounded-xl p-3 mt-4 text-center">
+    <p className="text-xs text-brand-600 font-medium">
+      💚 Free to join — you only ever pay for the services you book
+    </p>
+  </div>
+)}
             {mode === 'signup' && (
               <p className="text-xs text-gray-400 text-center mt-4 leading-relaxed">
                 By creating an account you agree to our{' '}
