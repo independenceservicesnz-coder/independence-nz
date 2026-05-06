@@ -172,20 +172,32 @@ alt="Happy elderly couple smiling together"
         </div>
       </section>
 
-      {/* TRUST STRIP */}
-      <div className="bg-white border-b border-gray-100">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
-            {trust.map(t => (
-              <div key={t.label} className="py-8 px-6 text-center">
-                <div className="text-3xl mb-3">{t.icon}</div>
-                <div className="text-sm font-medium mb-1">{t.label}</div>
-                <div className="text-xs text-gray-400">{t.sub}</div>
-              </div>
-            ))}
-          </div>
+{/* NO EXTRA FEES BANNER */}
+<div className="bg-brand-500 text-white">
+  <div className="max-w-6xl mx-auto px-4 py-5 text-center">
+    <p className="font-serif text-xl font-medium mb-1">
+      You only ever pay for the service you book. Nothing more.
+    </p>
+    <p className="text-white/75 text-sm">
+      No membership fees · No platform fees · No hidden charges · Just the cost of your service
+    </p>
+  </div>
+</div>
+
+{/* TRUST STRIP */}
+<div className="bg-white border-b border-gray-100">
+  <div className="max-w-6xl mx-auto px-4">
+    <div className="grid grid-cols-2 md:grid-cols-4 divide-x divide-gray-100">
+      {trust.map(t => (
+        <div key={t.label} className="py-8 px-6 text-center">
+          <div className="text-3xl mb-3">{t.icon}</div>
+          <div className="text-sm font-medium mb-1">{t.label}</div>
+          <div className="text-xs text-gray-400">{t.sub}</div>
         </div>
-      </div>
+      ))}
+    </div>
+  </div>
+</div>
 
       {/* REVIEWS */}
       <section className="max-w-6xl mx-auto px-4 py-16 w-full">
