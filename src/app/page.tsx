@@ -207,7 +207,7 @@ export default function HomePage() {
       <section className="max-w-6xl mx-auto px-4 py-16 w-full">
         <div className="rounded-2xl overflow-hidden h-72 md:h-96 relative">
           <img
-            src="https://images.unsplash.com/photo-1575783970733-1aaedde1db74?w=1200&q=80"
+            src="https://images.unsplash.com/photo-1499952127939-9bbf5af6c51c?w=1200&q=80"
             alt="Happy elderly couple smiling together"
             className="w-full h-full object-cover"
           />
