@@ -3,7 +3,6 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import BookingModal from '@/components/booking/BookingModal'
 
 const ALL_PROVIDERS = [
   { id: '1', name: 'Pristine Home Services', cat: 'cleaning', catLabel: 'Home Cleaning', location: 'Auckland Central', rating: 4.9, reviews: 128, price: 85, priceLabel: '$85 / visit', avail: 'Available tomorrow', emoji: '🧹', bg: 'from-emerald-50 to-emerald-100', topRated: true, desc: 'Professional home cleaning service' },
@@ -160,15 +159,12 @@ export default function BrowsePage() {
                         {p.avail}
                       </span>
                     </div>
-                    <BookingModal
-                      providerName={p.name}
-                      providerId={p.id}
-                      serviceName={p.catLabel}
-                      serviceDescription={p.desc}
-                      price={p.price}
-                      buttonLabel="Book now →"
-                      buttonClass="w-full bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors text-center block"
-                    />
+<Link
+  href={`/book?provider=${encodeURIComponent(p.name)}&service=${encodeURIComponent(p.catLabel)}&price=${p.price}&providerId=${p.id}`}
+  className="w-full bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors text-center block"
+>
+  Book now →
+</Link>
                   </div>
                 </div>
               </div>
