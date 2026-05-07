@@ -92,7 +92,6 @@ export default function BrowsePage() {
             </select>
           </div>
           <div className="flex gap-2 overflow-x-auto pb-1">
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
             {CATS.map(c => (
               <button key={c.id} onClick={() => setCat(c.id)}
                 className={`shrink-0 px-4 py-1.5 rounded-full text-sm font-medium border transition-all ${cat === c.id ? 'bg-brand-500 text-white border-brand-500' : 'bg-white text-gray-600 border-gray-200 hover:border-brand-300'}`}>
