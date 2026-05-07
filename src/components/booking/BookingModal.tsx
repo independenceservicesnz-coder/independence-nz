@@ -345,19 +345,18 @@ export default function BookingModal({
                   )}
 
                   <button
-                    onClick={handleConfirm}
-                    disabled={loading}
-                    className="w-full bg-brand-500 hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-4 rounded-xl transition-colors text-base flex items-center justify-center gap-2"
-                  >
-                    {loading ? (
-                      <>
-                        <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                        Processing...
-                      </>
-                    ) : (
-                      `Confirm & Pay $${price}.00 →`
-                    )}
-                  </button>
+  onClick={handleConfirm}
+  className="w-full bg-brand-500 hover:bg-brand-600 text-white font-bold py-4 rounded-xl transition-colors text-base flex items-center justify-center gap-2"
+>
+  {loading ? (
+    <>
+      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+      Processing...
+    </>
+  ) : (
+    `Confirm & Pay $${price}.00 →`
+  )}
+</button>
 
                   <p className="text-xs text-gray-400 text-center">
                     🔒 Secure payment by Stripe · Card authorised, not charged until service complete
