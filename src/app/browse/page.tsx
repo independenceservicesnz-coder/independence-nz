@@ -182,11 +182,7 @@ export default function BrowsePage() {
             Our friendly NZ-based team can find the right provider and book for you.
           </p>
           
-            href="tel:0273259707"
-            className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors"
-          >
-            📞 Call 027 325 9707
-          </a>
+<a href="tel:0273259707" className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors">📞 Call 027 325 9707</a>
           <p className="text-xs text-gray-400 mt-3">Mon–Fri 8am–6pm · Sat 9am–3pm</p>
         </div>
       </div>
