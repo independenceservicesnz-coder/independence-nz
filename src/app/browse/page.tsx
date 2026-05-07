@@ -3,7 +3,6 @@ import { useState, useMemo } from 'react'
 import Link from 'next/link'
 import Navbar from '@/components/layout/Navbar'
 import Footer from '@/components/layout/Footer'
-import BookingModal from '@/components/booking/BookingModal'
 
 const ALL_PROVIDERS = [
   { id: '1', name: 'Pristine Home Services', cat: 'cleaning', catLabel: 'Home Cleaning', location: 'Auckland Central', rating: 4.9, reviews: 128, price: 85, priceLabel: '$85 / visit', avail: 'Available tomorrow', emoji: '🧹', bg: 'from-emerald-50 to-emerald-100', topRated: true, desc: 'Professional home cleaning service' },
@@ -25,6 +24,10 @@ const CATS = [
   { id: 'care', label: '🤝 Personal Care' },
   { id: 'transport', label: '🚗 Transport' },
 ]
+
+function bookingUrl(p: typeof ALL_PROVIDERS[0]) {
+  return `/book?provider=${encodeURIComponent(p.name)}&service=${encodeURIComponent(p.catLabel)}&price=${p.price}&providerId=${p.id}`
+}
 
 export default function BrowsePage() {
   const [cat, setCat] = useState('all')
@@ -76,7 +79,7 @@ export default function BrowsePage() {
               <option value="price_desc">Price: High to low</option>
             </select>
           </div>
-          <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          <div className="flex gap-2 overflow-x-auto pb-1">
             {CATS.map(c => (
               <button
                 key={c.id}
@@ -94,9 +97,7 @@ export default function BrowsePage() {
         </div>
       </div>
 
-      {/* Results */}
       <div className="max-w-6xl mx-auto px-4 py-8 w-full flex-1">
-
         {/* No fees banner */}
         <div className="bg-brand-50 border border-brand-100 rounded-xl p-4 mb-6 flex items-center gap-3">
           <span className="text-2xl shrink-0">💚</span>
@@ -142,15 +143,13 @@ export default function BrowsePage() {
                         {p.avail}
                       </span>
                     </div>
-                    <BookingModal
-                      providerName={p.name}
-                      providerId={p.id}
-                      serviceName={p.catLabel}
-                      serviceDescription={p.desc}
-                      price={p.price}
-                      buttonLabel="Book now →"
-                      buttonClass="w-full bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors"
-                    />
+                    {/* SIMPLE LINK - no modal */}
+                    <Link
+                      href={bookingUrl(p)}
+                      className="w-full bg-brand-500 hover:bg-brand-600 text-white text-sm font-semibold py-2.5 rounded-xl transition-colors text-center block"
+                    >
+                      Book now →
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -162,7 +161,8 @@ export default function BrowsePage() {
         <div className="mt-12 bg-white rounded-2xl border border-gray-100 p-6 text-center">
           <p className="text-lg font-serif font-medium mb-1">Prefer to book by phone?</p>
           <p className="text-sm text-gray-400 mb-4">Our friendly NZ-based team can find the right provider and book for you.</p>
-          <a href="tel:0273259707" className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
+          <a href="tel:0273259707"
+            className="inline-flex items-center gap-2 bg-brand-500 hover:bg-brand-600 text-white font-semibold px-6 py-3 rounded-xl transition-colors">
             📞 Call 027 325 9707
           </a>
           <p className="text-xs text-gray-400 mt-3">Mon–Fri 8am–6pm · Sat 9am–3pm</p>
