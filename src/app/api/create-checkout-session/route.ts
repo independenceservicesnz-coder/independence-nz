@@ -1,25 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import Stripe from 'stripe'
-import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
-  console.log('=== CREATE CHECKOUT SESSION CALLED ===')
-
   try {
-    // Validate environment variables
-    if (!process.env.STRIPE_SECRET_KEY) {
-      console.error('Missing STRIPE_SECRET_KEY')
-      return NextResponse.json({ error: 'Payment not configured. Call 027 325 9707.' }, { status: 500 })
-    }
-
-    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      console.error('Missing Supabase env vars')
-      return NextResponse.json({ error: 'Database not configured. Call 027 325 9707.' }, { status: 500 })
-    }
-
-    // Parse body
     const body = await request.json()
-    console.log('Request body:', JSON.stringify(body))
+    console.log('Booking request received:', body)
 
     const {
       customerId,
@@ -35,29 +19,29 @@ export async function POST(request: NextRequest) {
       notes,
     } = body
 
-    // Validate required fields
     if (!customerId) {
-      return NextResponse.json({ error: 'Not signed in. Please sign in and try again.' }, { status: 401 })
+      return NextResponse.json({ error: 'Not signed in.' }, { status: 401 })
     }
-    if (!providerName || !serviceName || !priceCents || !scheduledDate || !scheduledTime) {
+
+    if (!priceCents || !scheduledDate || !scheduledTime) {
       return NextResponse.json({ error: 'Missing booking details.' }, { status: 400 })
     }
 
-    // Create Supabase admin client
+    // Save to Supabase
+    const { createClient } = await import('@supabase/supabase-js')
     const supabase = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL,
-      process.env.SUPABASE_SERVICE_ROLE_KEY
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
     )
 
-    // Save booking to Supabase FIRST
-    console.log('Saving booking to Supabase for customer:', customerId)
+    console.log('Saving booking to Supabase...')
     const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         customer_id: customerId,
-        provider_name: providerName,
+        provider_name: providerName || 'Provider',
         provider_id: providerId || null,
-        service_name: serviceName,
+        service_name: serviceName || 'Service',
         status: 'pending',
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime,
@@ -72,14 +56,15 @@ export async function POST(request: NextRequest) {
     if (bookingError) {
       console.error('Supabase error:', bookingError)
       return NextResponse.json({
-        error: `Database error: ${bookingError.message}. Please call 027 325 9707.`
+        error: 'Could not save booking: ' + bookingError.message
       }, { status: 500 })
     }
 
     console.log('Booking saved! ID:', booking.id)
 
     // Create Stripe session
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    const Stripe = (await import('stripe')).default
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
       apiVersion: '2024-06-20',
     })
 
@@ -93,7 +78,7 @@ export async function POST(request: NextRequest) {
         price_data: {
           currency: 'nzd',
           product_data: {
-            name: serviceName,
+            name: serviceName || 'Service',
             description: `${providerName} · ${scheduledDate} at ${scheduledTime}`,
           },
           unit_amount: priceCents,
@@ -102,12 +87,12 @@ export async function POST(request: NextRequest) {
       }],
       mode: 'payment',
       payment_intent_data: {
-        capture_method: 'manual', // Hold payment until service complete
+        capture_method: 'manual',
         metadata: {
           bookingId: booking.id,
           customerId,
-          providerName,
-          serviceName,
+          providerName: providerName || '',
+          serviceName: serviceName || '',
         },
       },
       success_url: `${appUrl}/booking/success?booking_id=${booking.id}`,
@@ -115,10 +100,6 @@ export async function POST(request: NextRequest) {
       metadata: {
         bookingId: booking.id,
         customerId,
-        providerName,
-        serviceName,
-        scheduledDate,
-        scheduledTime,
       },
       custom_text: {
         submit: {
@@ -127,19 +108,16 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    console.log('Stripe session created:', session.id)
+    console.log('Stripe session created:', session.url)
 
-    // Update booking with Stripe session ID
     await supabase
       .from('bookings')
       .update({
-        stripe_session_id: session.id,
         stripe_payment_intent_id: session.payment_intent as string || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', booking.id)
 
-    console.log('=== SUCCESS - Redirecting to Stripe ===')
     return NextResponse.json({ url: session.url, bookingId: booking.id })
 
   } catch (error: any) {
