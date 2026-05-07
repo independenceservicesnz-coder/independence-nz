@@ -3,76 +3,61 @@ import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
 export async function POST(request: NextRequest) {
+  console.log('=== CREATE CHECKOUT SESSION CALLED ===')
+
   try {
-    // Log which env vars exist (check in Vercel function logs)
-    console.log('SUPABASE_URL exists:', !!process.env.NEXT_PUBLIC_SUPABASE_URL)
-    console.log('SERVICE_ROLE exists:', !!process.env.SUPABASE_SERVICE_ROLE_KEY)
-    console.log('STRIPE_KEY exists:', !!process.env.STRIPE_SECRET_KEY)
-    console.log('APP_URL:', process.env.NEXT_PUBLIC_APP_URL)
-
+    // Validate environment variables
     if (!process.env.STRIPE_SECRET_KEY) {
-      return NextResponse.json(
-        { error: 'Payment system not configured. Please call 027 325 9707.' },
-        { status: 500 }
-      )
+      console.error('Missing STRIPE_SECRET_KEY')
+      return NextResponse.json({ error: 'Payment not configured. Call 027 325 9707.' }, { status: 500 })
     }
 
-    if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      return NextResponse.json(
-        { error: 'Database not configured. Please call 027 325 9707.' },
-        { status: 500 }
-      )
+    if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+      console.error('Missing Supabase env vars')
+      return NextResponse.json({ error: 'Database not configured. Call 027 325 9707.' }, { status: 500 })
     }
 
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2024-06-20',
-    })
-
-    const supabaseAdmin = createClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.SUPABASE_SERVICE_ROLE_KEY!
-    )
-
+    // Parse body
     const body = await request.json()
+    console.log('Request body:', JSON.stringify(body))
+
     const {
+      customerId,
+      customerEmail,
+      customerName,
       providerName,
       providerId,
       serviceName,
-      serviceId,
       priceCents,
       scheduledDate,
       scheduledTime,
       address,
       notes,
-      customerId,
-      customerEmail,
-      customerName,
     } = body
 
-    console.log('Booking request received:', { providerName, serviceName, priceCents, customerId })
-
-    if (!priceCents || !scheduledDate || !scheduledTime || !providerName || !serviceName) {
-      return NextResponse.json(
-        { error: 'Missing required booking details.' },
-        { status: 400 }
-      )
-    }
-
+    // Validate required fields
     if (!customerId) {
-      return NextResponse.json(
-        { error: 'You must be signed in to book.' },
-        { status: 401 }
-      )
+      return NextResponse.json({ error: 'Not signed in. Please sign in and try again.' }, { status: 401 })
+    }
+    if (!providerName || !serviceName || !priceCents || !scheduledDate || !scheduledTime) {
+      return NextResponse.json({ error: 'Missing booking details.' }, { status: 400 })
     }
 
-    // Save booking to Supabase as pending FIRST
-    console.log('Saving booking to Supabase...')
-    const { data: booking, error: bookingError } = await supabaseAdmin
+    // Create Supabase admin client
+    const supabase = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+
+    // Save booking to Supabase FIRST
+    console.log('Saving booking to Supabase for customer:', customerId)
+    const { data: booking, error: bookingError } = await supabase
       .from('bookings')
       .insert({
         customer_id: customerId,
+        provider_name: providerName,
         provider_id: providerId || null,
-        service_id: serviceId || null,
+        service_name: serviceName,
         status: 'pending',
         scheduled_date: scheduledDate,
         scheduled_time: scheduledTime,
@@ -84,56 +69,45 @@ export async function POST(request: NextRequest) {
       .select()
       .single()
 
-    if (bookingError || !booking) {
-      console.error('Supabase booking error:', bookingError)
-      return NextResponse.json(
-        { error: 'Could not save booking. Please try again.' },
-        { status: 500 }
-      )
+    if (bookingError) {
+      console.error('Supabase error:', bookingError)
+      return NextResponse.json({
+        error: `Database error: ${bookingError.message}. Please call 027 325 9707.`
+      }, { status: 500 })
     }
 
-    console.log('Booking saved with ID:', booking.id)
+    console.log('Booking saved! ID:', booking.id)
 
-    // Create Stripe checkout session
+    // Create Stripe session
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: '2024-06-20',
+    })
+
     const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://independencenz.com'
 
     console.log('Creating Stripe session...')
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
       customer_email: customerEmail || undefined,
-      billing_address_collection: 'auto',
-      line_items: [
-        {
-          price_data: {
-            currency: 'nzd',
-            product_data: {
-              name: serviceName,
-              description: `${providerName} · ${new Date(scheduledDate).toLocaleDateString('en-NZ', {
-                weekday: 'long',
-                day: 'numeric',
-                month: 'long',
-              })} at ${scheduledTime}`,
-            },
-            unit_amount: priceCents,
+      line_items: [{
+        price_data: {
+          currency: 'nzd',
+          product_data: {
+            name: serviceName,
+            description: `${providerName} · ${scheduledDate} at ${scheduledTime}`,
           },
-          quantity: 1,
+          unit_amount: priceCents,
         },
-      ],
+        quantity: 1,
+      }],
       mode: 'payment',
       payment_intent_data: {
-        capture_method: 'manual',
-        description: `Independence NZ · ${serviceName} · ${providerName}`,
+        capture_method: 'manual', // Hold payment until service complete
         metadata: {
           bookingId: booking.id,
           customerId,
-          customerName: customerName || '',
-          customerEmail: customerEmail || '',
-          providerId: providerId || '',
           providerName,
           serviceName,
-          scheduledDate,
-          scheduledTime,
-          address: address || '',
         },
       },
       success_url: `${appUrl}/booking/success?booking_id=${booking.id}`,
@@ -148,40 +122,30 @@ export async function POST(request: NextRequest) {
       },
       custom_text: {
         submit: {
-          message: 'Your card is authorised but not charged until your service is complete. No platform fees.',
+          message: 'Card authorised but not charged until service is complete. No platform fees.',
         },
       },
     })
 
-    console.log('Stripe session created:', session.id, 'URL:', session.url)
+    console.log('Stripe session created:', session.id)
 
-    // Update booking with Stripe payment intent ID
-    await supabaseAdmin
+    // Update booking with Stripe session ID
+    await supabase
       .from('bookings')
       .update({
-        stripe_payment_intent_id: session.payment_intent as string,
+        stripe_session_id: session.id,
+        stripe_payment_intent_id: session.payment_intent as string || null,
         updated_at: new Date().toISOString(),
       })
       .eq('id', booking.id)
 
-    return NextResponse.json({
-      url: session.url,
-      bookingId: booking.id,
-    })
+    console.log('=== SUCCESS - Redirecting to Stripe ===')
+    return NextResponse.json({ url: session.url, bookingId: booking.id })
 
   } catch (error: any) {
-    console.error('Checkout session error:', error)
-
-    if (error.type === 'StripeAuthenticationError') {
-      return NextResponse.json(
-        { error: 'Payment system error. Please call 027 325 9707.' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json(
-      { error: error.message || 'Something went wrong. Please try again or call 027 325 9707.' },
-      { status: 500 }
-    )
+    console.error('Checkout error:', error)
+    return NextResponse.json({
+      error: error.message || 'Something went wrong. Please call 027 325 9707.'
+    }, { status: 500 })
   }
 }
