@@ -11,17 +11,29 @@ const supabaseAdmin = createClient(
 )
 
 export default async function AdminPage() {
-  const { data: bookings } = await supabaseAdmin
-    .from('bookings')
-    .select('*, profiles:customer_id(full_name, email, phone)')
-    .order('created_at', { ascending: false })
+const { data: bookings } = await supabaseAdmin
+  .from('bookings')
+  .select('*')
+  .order('created_at', { ascending: false })
+
+// Get customer profiles separately
+const customerIds = (bookings || []).map((b: any) => b.customer_id).filter(Boolean)
+const { data: customerProfiles } = customerIds.length > 0
+  ? await supabaseAdmin.from('profiles').select('id, full_name, email, phone').in('id', customerIds)
+  : { data: [] }
+
+// Merge profiles into bookings
+const bookingsWithProfiles = (bookings || []).map((b: any) => ({
+  ...b,
+  profiles: (customerProfiles || []).find((p: any) => p.id === b.customer_id) || null
+}))
 
   const { data: profiles } = await supabaseAdmin
     .from('profiles')
     .select('id, full_name, email, phone, created_at')
     .order('created_at', { ascending: false })
 
-  const all: any[] = bookings || []
+  const all: any[] = bookingsWithProfiles || []
   const allCustomers: any[] = profiles || []
 
   const pending = all.filter(b => b.status === 'pending')
