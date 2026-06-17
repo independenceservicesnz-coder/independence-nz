@@ -15,9 +15,7 @@ export default async function AccountPage() {
       .single(),
     supabase
       .from('bookings')
-      .select(
-        'id, status, scheduled_date, scheduled_time, providers(business_name), services(name)'
-      )
+      .select('id, status, scheduled_date, scheduled_time, provider_name, service_name')
       .eq('customer_id', user!.id)
       .order('scheduled_date', { ascending: false })
       .limit(5),
@@ -89,10 +87,10 @@ export default async function AccountPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium truncate">
-                    {b.services?.name}
+                    {b.service_name}
                   </p>
                   <p className="text-xs text-gray-400">
-                    {b.providers?.business_name} ·{' '}
+                    {b.provider_name} ·{' '}
                     {new Date(b.scheduled_date).toLocaleDateString('en-NZ', {
                       weekday: 'short',
                       day: 'numeric',
