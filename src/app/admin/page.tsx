@@ -6,11 +6,14 @@ import ReleasePaymentButton from './ReleasePaymentButton'
 import NotifyProviderButton from './NotifyProviderButton'
 import ManualBookingButton from './ManualBookingButton'
 
+const ADMIN_EMAILS = (process.env.NEXT_PUBLIC_ADMIN_EMAILS || 'independenceservicesnz@gmail.com').split(',').map(e => e.trim())
+
 export default function AdminPage() {
   const [bookings, setBookings] = useState<any[]>([])
   const [customers, setCustomers] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [lastUpdated, setLastUpdated] = useState<Date>(new Date())
+  const [unauthorized, setUnauthorized] = useState(false)
   const supabase = createClient()
 
   const loadData = async () => {
@@ -41,7 +44,16 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    loadData()
+    const checkAuth = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || !ADMIN_EMAILS.includes(user.email || '')) {
+        setUnauthorized(true)
+        setLoading(false)
+        return
+      }
+      loadData()
+    }
+    checkAuth()
 
     // Real-time subscription for bookings
     const bookingsChannel = supabase
@@ -94,6 +106,21 @@ export default function AdminPage() {
     held: { label: '🔒 Payment held', text: 'text-brand-500' },
     paid: { label: '✅ Released', text: 'text-gray-400' },
     failed: { label: '❌ Failed', text: 'text-red-500' },
+  }
+
+  if (unauthorized) {
+    return (
+      <div className="min-h-screen bg-[#F7F9F7]">
+        <Navbar />
+        <div className="flex items-center justify-center py-20">
+          <div className="text-center">
+            <p className="text-4xl mb-4">🔒</p>
+            <p className="font-medium text-gray-700 mb-2">Access denied</p>
+            <p className="text-sm text-gray-400">You do not have permission to view this page.</p>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   if (loading) {
