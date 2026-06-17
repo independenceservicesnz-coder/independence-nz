@@ -21,9 +21,12 @@ export default function Navbar() {
   const supabase = createClient()
 
   useEffect(() => {
+    let currentUserId: string | null = null
+
     const load = async () => {
       const { data: { user } } = await supabase.auth.getUser()
       setUser(user)
+      currentUserId = user?.id ?? null
       if (user) {
         const [{ data: prof }, { data: notifs }] = await Promise.all([
           supabase.from('profiles').select('full_name, email').eq('id', user.id).single(),
@@ -39,6 +42,7 @@ export default function Navbar() {
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
       setUser(session?.user ?? null)
+      currentUserId = session?.user?.id ?? null
       if (!session?.user) { setProfile(null); setNotifications([]) }
       else load()
     })
@@ -51,7 +55,7 @@ export default function Navbar() {
         schema: 'public',
         table: 'notifications',
       }, (payload) => {
-        if (payload.new.user_id === user?.id) {
+        if (payload.new.user_id === currentUserId) {
           setNotifications(prev => [payload.new, ...prev])
           setUnreadCount(prev => prev + 1)
         }
