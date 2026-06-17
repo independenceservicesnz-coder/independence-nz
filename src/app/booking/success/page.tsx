@@ -5,13 +5,14 @@ import Navbar from '@/components/layout/Navbar'
 export default async function BookingSuccessPage({
   searchParams,
 }: {
-  searchParams: { booking_id?: string }
+  searchParams: Promise<{ booking_id?: string }>
 }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
+  const { booking_id } = await searchParams
 
   // Update booking to confirmed
-  if (searchParams.booking_id && user) {
+  if (booking_id && user) {
     await supabase
       .from('bookings')
       .update({
@@ -19,17 +20,17 @@ export default async function BookingSuccessPage({
         payment_status: 'held',
         updated_at: new Date().toISOString(),
       })
-      .eq('id', searchParams.booking_id)
+      .eq('id', booking_id)
       .eq('customer_id', user.id)
   }
 
   // Get booking details
   let booking: any = null
-  if (searchParams.booking_id && user) {
+  if (booking_id && user) {
     const { data } = await supabase
       .from('bookings')
       .select('*')
-      .eq('id', searchParams.booking_id)
+      .eq('id', booking_id)
       .eq('customer_id', user.id)
       .single()
     booking = data
