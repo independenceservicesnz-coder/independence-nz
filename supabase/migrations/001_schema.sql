@@ -16,6 +16,9 @@ create table public.profiles (
 );
 alter table public.profiles enable row level security;
 create policy "Users can view own profile" on public.profiles for select using (auth.uid() = id);
+create policy "Admins can view all profiles" on public.profiles for select using (
+  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+);
 create policy "Users can update own profile" on public.profiles for update using (auth.uid() = id);
 create policy "Users can insert own profile" on public.profiles for insert with check (auth.uid() = id);
 
@@ -89,6 +92,8 @@ create table public.bookings (
   customer_id uuid references public.profiles(id),
   provider_id uuid references public.providers(id),
   service_id uuid references public.services(id),
+  provider_name text,
+  service_name text,
   status text default 'pending',
   scheduled_date date not null,
   scheduled_time time not null,
@@ -102,6 +107,12 @@ create table public.bookings (
 );
 alter table public.bookings enable row level security;
 create policy "Customers view own bookings" on public.bookings for select using (auth.uid() = customer_id);
+create policy "Admins view all bookings" on public.bookings for select using (
+  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+);
+create policy "Admins update all bookings" on public.bookings for update using (
+  exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
+);
 create policy "Customers create bookings" on public.bookings for insert with check (auth.uid() = customer_id);
 create policy "Customers update own bookings" on public.bookings for update using (auth.uid() = customer_id);
 create policy "Providers view their bookings" on public.bookings for select using (
@@ -149,3 +160,4 @@ create table public.notifications (
 alter table public.notifications enable row level security;
 create policy "Users view own notifications" on public.notifications for select using (auth.uid() = user_id);
 create policy "Users update own notifications" on public.notifications for update using (auth.uid() = user_id);
+create policy "Service role can insert notifications" on public.notifications for insert with check (true);
