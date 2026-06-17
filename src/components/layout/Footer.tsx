@@ -14,7 +14,7 @@ export default function Footer() {
           <Link href="/terms" className="text-sm text-gray-400 hover:text-brand-500 transition-colors">Terms</Link>
           <Link href="/privacy" className="text-sm text-gray-400 hover:text-brand-500 transition-colors">Privacy</Link>
         </div>
-        <p className="text-sm text-gray-400">© 2025 Independence NZ</p>
+        <p className="text-sm text-gray-400">© {new Date().getFullYear()} Independence NZ</p>
       </div>
     </footer>
   )
