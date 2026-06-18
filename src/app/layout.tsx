@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { DM_Sans, Fraunces } from 'next/font/google'
 import './globals.css'
+import ChatWidget from '@/components/ChatWidget'
 
 const dmSans = DM_Sans({ subsets: ['latin'], variable: '--font-dm-sans', display: 'swap' })
 const fraunces = Fraunces({ subsets: ['latin'], variable: '--font-fraunces', display: 'swap' })
@@ -15,6 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${dmSans.variable} ${fraunces.variable}`}>
       <body className="bg-[#F7F9F7] text-gray-900 font-sans antialiased">
         {children}
+        <ChatWidget />
       </body>
     </html>
   )
